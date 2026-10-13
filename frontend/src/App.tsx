@@ -11,7 +11,7 @@ function NavigationBar() {
   return (
     <nav className="navbar">
       <div className="nav-left">
-        {/* Brand icon only, no text */}
+        {/* Clean gold-bordered icon, NO text */}
         <Link to="/" className="nav-logo-icon" title="Workspaces">
           <Layers size={18} />
         </Link>
@@ -36,7 +36,7 @@ function NavigationBar() {
 
       <div className="nav-right">
         <div className="nav-status-pill">
-          <div className="status-indicator"></div>
+          <div className="gold-dot"></div>
           <span>LOCAL ENGINE</span>
         </div>
       </div>

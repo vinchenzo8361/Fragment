@@ -26,33 +26,72 @@ const Home = () => {
 
   return (
     <div className="home-container">
-      <div className="home-header">
-        <div>
-          <h1 className="home-title">Projects</h1>
-          <p className="home-subtitle">Manage image puzzle reconstruction sessions and shredded document runs.</p>
+      {/* Clear Executive Banner */}
+      <div className="action-banner">
+        <div className="action-banner-text">
+          <h1>Image & Document Reconstruction</h1>
+          <p>
+            Reconstruct scrambled image puzzles and shredded documents using computer vision edge gradients, classical optimization, and machine learning.
+          </p>
         </div>
-        <Link to="/setup" className="btn btn-primary">
-          <Plus size={15} />
+        <Link to="/setup" className="btn btn-primary" style={{ flexShrink: 0 }}>
+          <Plus size={16} />
           <span>New Project</span>
         </Link>
       </div>
 
+      {/* Crystal Clear 3-Step Process Strip */}
+      <div className="workflow-steps-strip">
+        <div className="workflow-step-card">
+          <div className="step-number">1</div>
+          <div className="step-content">
+            <h3>Upload Media</h3>
+            <p>Upload a source image or shredded strips into your workspace.</p>
+          </div>
+        </div>
+        <div className="workflow-step-card">
+          <div className="step-number">2</div>
+          <div className="step-content">
+            <h3>Split & Extract</h3>
+            <p>Partition the image into indexed pieces or detect physical fragments.</p>
+          </div>
+        </div>
+        <div className="workflow-step-card">
+          <div className="step-number">3</div>
+          <div className="step-content">
+            <h3>Solve & Reconstruct</h3>
+            <p>Run boundary matching and greedy optimization to solve the layout.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Projects Section */}
+      <div className="section-header-bar">
+        <h2 className="section-title">
+          <Folder size={18} color="var(--gold-pure)" />
+          <span>Your Projects</span>
+        </h2>
+        <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
+          {projects.length} {projects.length === 1 ? 'PROJECT' : 'PROJECTS'}
+        </span>
+      </div>
+
       {loading ? (
-        <div className="empty-state">
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Loading projects...</p>
+        <div className="empty-state-box">
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Loading project registry...</p>
         </div>
       ) : projects.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-icon">
-            <Folder size={22} />
+        <div className="empty-state-box">
+          <div style={{ width: 44, height: 44, margin: '0 auto 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, background: 'var(--surface-navy)', color: 'var(--gold-pure)' }}>
+            <Folder size={20} />
           </div>
-          <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.35rem' }}>No projects found</h3>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
-            Create a project to begin reconstructing images from tiles or strips.
+          <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '0.4rem', color: '#fff' }}>No Projects Created Yet</h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', maxWidth: 440, margin: '0 auto 1.5rem' }}>
+            Click below to start your first project and configure a reconstruction grid.
           </p>
           <Link to="/setup" className="btn btn-primary">
             <Plus size={15} />
-            <span>Create Project</span>
+            <span>Create First Project</span>
           </Link>
         </div>
       ) : (
@@ -62,7 +101,7 @@ const Home = () => {
               <div>
                 <div className="project-card-header">
                   <h3 className="project-card-title">{p.name}</h3>
-                  <span className="badge-tag">{formatPuzzleType(p.puzzle_type)}</span>
+                  <span className="gold-badge">{formatPuzzleType(p.puzzle_type)}</span>
                 </div>
                 <div className="project-card-id">{p.id}</div>
                 <div className="project-meta-row">
@@ -72,12 +111,12 @@ const Home = () => {
                   </div>
                   <div className="meta-item">
                     <Grid size={14} />
-                    <span>{p.grid_rows && p.grid_cols ? `${p.grid_rows}×${p.grid_cols}` : 'Grid'}</span>
+                    <span>{p.grid_rows && p.grid_cols ? `${p.grid_rows}×${p.grid_cols} Grid` : 'Dynamic'}</span>
                   </div>
                 </div>
               </div>
-              <Link to={`/workspace/${p.id}`} className="btn btn-secondary" style={{ width: '100%' }}>
-                <span>Open Project</span>
+              <Link to={`/workspace/${p.id}`} className="btn btn-navy" style={{ width: '100%' }}>
+                <span>Open Project Workspace</span>
                 <ArrowRight size={14} />
               </Link>
             </div>

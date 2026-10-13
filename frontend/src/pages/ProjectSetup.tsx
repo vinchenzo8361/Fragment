@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Grid, FileText, Scissors, Puzzle } from 'lucide-react';
+import { Grid, FileText, Scissors, Puzzle, Check } from 'lucide-react';
 import { createProject } from '../api';
 
 const ProjectSetup = () => {
@@ -66,27 +66,27 @@ const ProjectSetup = () => {
   return (
     <div className="setup-container">
       <div className="setup-card">
-        <h2 className="setup-title">New Project</h2>
+        <h2 className="setup-title">Create New Project</h2>
         <p className="setup-description">
-          Set up a new reconstruction project and specify the fragmentation type.
+          Choose a project name and reconstruction style. You can adjust pieces and settings anytime inside the workspace.
         </p>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">Project Name</label>
+            <label className="form-label">1. Project Name</label>
             <input 
               type="text" 
               className="form-input"
               value={name} 
               onChange={(e) => setName(e.target.value)} 
               required 
-              placeholder="e.g. Test Pattern 01"
+              placeholder="e.g. Scrambled Landscape #1"
               autoFocus
             />
           </div>
 
           <div className="form-group">
-            <label className="form-label">Reconstruction Type</label>
+            <label className="form-label">2. Select Puzzle Type</label>
             <div className="type-options-list">
               {puzzleTypes.map((t) => (
                 <div 
@@ -95,7 +95,7 @@ const ProjectSetup = () => {
                   onClick={() => t.enabled && setPuzzleType(t.id)}
                 >
                   <div className="type-option-main">
-                    <div style={{ color: puzzleType === t.id ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
+                    <div style={{ color: puzzleType === t.id ? 'var(--gold-pure)' : 'var(--text-muted)' }}>
                       {t.icon}
                     </div>
                     <div>
@@ -103,9 +103,14 @@ const ProjectSetup = () => {
                       <div className="type-option-desc">{t.desc}</div>
                     </div>
                   </div>
+                  {puzzleType === t.id && (
+                    <div style={{ color: 'var(--gold-pure)' }}>
+                      <Check size={16} />
+                    </div>
+                  )}
                   {!t.enabled && (
-                    <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontFamily: 'var(--font-mono)' }}>
-                      Planned
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
+                      Future Stage
                     </span>
                   )}
                 </div>
@@ -115,10 +120,10 @@ const ProjectSetup = () => {
 
           {puzzleType === 'square-tile' && (
             <div className="form-group">
-              <label className="form-label">Grid Partition</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+              <label className="form-label">3. Grid Dimensions</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Rows</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Rows (horizontal cuts)</span>
                   <input 
                     type="number" 
                     min={2} 
@@ -130,7 +135,7 @@ const ProjectSetup = () => {
                   />
                 </div>
                 <div>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Columns</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Columns (vertical cuts)</span>
                   <input 
                     type="number" 
                     min={2} 
@@ -145,7 +150,7 @@ const ProjectSetup = () => {
             </div>
           )}
 
-          <div style={{ marginTop: '1.75rem', display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+          <div style={{ marginTop: '2rem', display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
             <button 
               type="button" 
               className="btn btn-secondary"
@@ -158,7 +163,7 @@ const ProjectSetup = () => {
               className="btn btn-primary" 
               disabled={loading}
             >
-              {loading ? 'Creating...' : 'Create Project'}
+              {loading ? 'Creating...' : 'Create & Enter Studio'}
             </button>
           </div>
         </form>

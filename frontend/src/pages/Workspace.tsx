@@ -6,7 +6,9 @@ import {
   Layers, 
   Grid, 
   Play, 
-  Sliders
+  Sliders,
+  HelpCircle,
+  FileImage
 } from 'lucide-react';
 import { getProject, uploadImage } from '../api';
 
@@ -44,8 +46,8 @@ const Workspace = () => {
 
   if (!project) {
     return (
-      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
-        Loading project...
+      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+        Loading project workspace...
       </div>
     );
   }
@@ -55,26 +57,26 @@ const Workspace = () => {
       {/* Top Application Bar */}
       <div className="workspace-toolbar">
         <div className="workspace-identity">
-          <Link to="/" className="btn btn-secondary" style={{ padding: '0.35rem 0.6rem' }} title="Back">
+          <Link to="/" className="btn btn-secondary" style={{ padding: '0.35rem 0.6rem' }} title="Back to Projects">
             <ArrowLeft size={14} />
           </Link>
           <span className="workspace-title">{project.name}</span>
-          <span className="badge-tag">
+          <span className="gold-badge">
             {project.puzzle_type.toUpperCase()}
           </span>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', fontFamily: 'var(--font-mono)' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
             {project.id}
           </span>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button className="btn btn-secondary" style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}>
+        <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+          <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>
             <Sliders size={13} />
             <span>Options</span>
           </button>
-          <button className="btn btn-primary" style={{ padding: '0.35rem 0.85rem', fontSize: '0.8rem' }}>
-            <Play size={13} />
-            <span>Solve</span>
+          <button className="btn btn-primary" style={{ padding: '0.4rem 0.95rem', fontSize: '0.8rem' }}>
+            <Play size={13} fill="#000" />
+            <span>Run Reconstruction</span>
           </button>
         </div>
       </div>
@@ -84,8 +86,8 @@ const Workspace = () => {
         {/* Left: Input Assets */}
         <aside className="sidebar-panel">
           <div className="panel-titlebar">
-            <span>Sources</span>
-            <span style={{ fontFamily: 'var(--font-mono)' }}>
+            <span>1. Source Media</span>
+            <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--gold-pure)' }}>
               {project.images ? project.images.length : 0}
             </span>
           </div>
@@ -98,31 +100,31 @@ const Workspace = () => {
                 accept="image/*" 
                 disabled={uploading}
               />
-              <Upload size={18} style={{ color: 'var(--text-secondary)', marginBottom: '0.35rem' }} />
-              <div style={{ fontSize: '0.8rem', fontWeight: 500 }}>
-                {uploading ? 'Uploading...' : 'Upload Image'}
+              <Upload size={20} style={{ color: 'var(--gold-pure)', marginBottom: '0.4rem' }} />
+              <div style={{ fontSize: '0.825rem', fontWeight: 600, color: 'var(--text-white)' }}>
+                {uploading ? 'Processing Image...' : 'Click to Upload Source Image'}
               </div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', marginTop: '0.2rem' }}>
-                PNG, JPG or WEBP
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', marginTop: '0.25rem' }}>
+                Supports PNG, JPG or WEBP
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {project.images && project.images.length > 0 ? (
                 project.images.map((img: any) => (
                   <div key={img.id} className="image-record-item">
-                    <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '170px' }}>
-                      <div style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{img.filename}</div>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontFamily: 'var(--font-mono)' }}>
-                        {img.width && img.height ? `${img.width}×${img.height}` : 'Uploaded'}
+                    <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '180px' }}>
+                      <div style={{ fontWeight: 600, color: 'var(--text-white)' }}>{img.filename}</div>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
+                        {img.width && img.height ? `${img.width}×${img.height} px` : 'Loaded'} • {img.id}
                       </div>
                     </div>
-                    <span className="badge-tag" style={{ fontSize: '0.65rem' }}>IMG</span>
+                    <FileImage size={16} color="var(--gold-pure)" />
                   </div>
                 ))
               ) : (
-                <div style={{ textAlign: 'center', padding: '1rem 0', color: 'var(--text-tertiary)', fontSize: '0.75rem' }}>
-                  No source files uploaded
+                <div style={{ textAlign: 'center', padding: '1.25rem 0', color: 'var(--text-dim)', fontSize: '0.78rem' }}>
+                  No source image yet. Upload one above.
                 </div>
               )}
             </div>
@@ -132,28 +134,29 @@ const Workspace = () => {
         {/* Center: Canvas Viewport */}
         <main className="canvas-container">
           <div className="canvas-placeholder-box">
-            <Grid size={32} style={{ margin: '0 auto 0.75rem', opacity: 0.3 }} />
-            <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.25rem', color: 'var(--text-primary)' }}>
+            <Grid size={32} style={{ margin: '0 auto 0.75rem', color: 'var(--gold-pure)' }} />
+            <h3 style={{ fontWeight: 700, fontSize: '1rem', marginBottom: '0.35rem', color: 'var(--text-white)' }}>
               Reconstruction Canvas
-            </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>
+            </h3>
+            <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
               {project.images && project.images.length > 0
-                ? 'Source loaded. Ready for tile splitting in Stage 2.'
-                : 'Upload a source image from the left panel to initialize.'}
-            </div>
+                ? 'Source media loaded. Click "Split Image into Tiles" in Stage 2 to begin.'
+                : 'Upload a puzzle or document image on the left to start.'}
+            </p>
           </div>
         </main>
 
         {/* Right: Piece Details */}
         <aside className="sidebar-panel-right">
           <div className="panel-titlebar">
-            <span>Inspector</span>
-            <Layers size={14} />
+            <span>2. Fragment Inspector</span>
+            <HelpCircle size={14} color="var(--text-dim)" />
           </div>
 
           <div className="panel-scrollable">
-            <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-tertiary)', fontSize: '0.8rem' }}>
-              Select a piece or tile to inspect its properties and neighbor scores.
+            <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-dim)', fontSize: '0.8rem', lineHeight: 1.5 }}>
+              <Layers size={28} style={{ margin: '0 auto 0.75rem', opacity: 0.3 }} />
+              Click any piece from the inventory or canvas to inspect edge gradients, coordinates, and neighbor match confidence.
             </div>
           </div>
         </aside>

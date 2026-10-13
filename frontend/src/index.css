@@ -1,37 +1,41 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* 
-  60-30-10 Professional Design Rule:
-  60% Base / Background: Clean, crisp matte slate (#0f1117, #161922)
-  30% Secondary / Structural Surfaces: Card panels, borders, sidebars (#1c202d, #272c3d)
-  10% Accent / Interactive Focus: Intentional Royal Cobalt (#3b82f6)
+  High-End Executive Luxury & Precision Palette:
+  - 60% Dominant Base: Pure Deep Black (#000000, #08080a)
+  - 30% Structural Secondary: Off-Black & Dark Charcoal Surfaces (#111216, #181920) with Dark Navy (#101728, #162035)
+  - 5-8% Pure Gold Accents: Metallic Pure Gold (#D4AF37, #F59E0B) for sharp, deliberate points of focus
 */
 :root {
-  /* 60% Dominant Base */
-  --bg-base: #0c0e14;
-  --bg-subtle: #12151d;
+  /* 60% Base */
+  --bg-black: #000000;
+  --bg-offblack: #090a0d;
   
-  /* 30% Structural Secondary */
-  --surface-card: #171b26;
-  --surface-card-hover: #1c2130;
-  --surface-elevated: #212636;
-  --border-light: #262c3e;
-  --border-strong: #333a52;
+  /* 30% Structural Surfaces & Navy */
+  --surface-panel: #111318;
+  --surface-panel-hover: #161922;
+  --surface-navy: #0f172a;
+  --surface-navy-subtle: #131d36;
+  --border-dark: #1e222d;
+  --border-navy: #1e293b;
+  --border-gold-subtle: rgba(212, 175, 55, 0.3);
   
   /* Text Contrast Hierarchy */
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-tertiary: #64748b;
+  --text-white: #ffffff;
+  --text-muted: #9ca3af;
+  --text-dim: #525866;
 
-  /* 10% Accent Focus */
-  --accent-primary: #3b82f6;
-  --accent-primary-hover: #2563eb;
-  --accent-primary-subtle: rgba(59, 130, 246, 0.12);
-  --accent-success: #10b981;
-  --accent-warning: #f59e0b;
+  /* 5-8% Pure Gold Accent Focus */
+  --gold-pure: #d4af37;
+  --gold-bright: #e6c34f;
+  --gold-glow: rgba(212, 175, 55, 0.15);
+  --gold-border: #d4af37;
+  
+  --navy-accent: #1e3a8a;
+  --navy-accent-hover: #1e40af;
 
   /* Fonts */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
 
@@ -43,8 +47,8 @@
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--bg-base);
-  color: var(--text-primary);
+  background-color: var(--bg-black);
+  color: var(--text-white);
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -57,15 +61,18 @@ body {
   flex-direction: column;
 }
 
-/* Subtle, clean utility scrollbars */
+/* Precision scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-base);
+  background: var(--bg-black);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 4px;
+  background: #232733;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #373e52;
 }
