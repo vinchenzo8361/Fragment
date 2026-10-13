@@ -1,36 +1,36 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* 
-  Sharp Pure White, Ethereal Off-White & Radiant Pure Gold:
-  - 60% Dominant Base: Sharp, crisp pure white (#FFFFFF) with an intricate, subtle gold geometric dot matrix & radial aura
-  - 30% Structural Secondary: Warm Ivory & Alabaster cards (#FFFFFF, #FBFBF9), refined gold-infused borders (#E5DFD0, #D9D2BF)
-  - 10% Accent Focus: Metallic Radiant Gold (#C59B27, #D4AF37)
+  Refined Angelic / Ethereal Luxury:
+  - 60% Dominant Base: Pure White (#FFFFFF) with clearly visible subtle gold puzzle-mesh patterns
+  - 30% Structural Secondary: Off-White / Alabaster Cards (#FCFCF9), Warm Ivory (#F7F6F0), Gold-accented Navy / Slate Navbar
+  - 10% Pure Gold Accents: Metallic Radiant Gold (#B8860B, #C59B27, #D4AF37)
 */
 :root {
   /* 60% Base */
   --bg-white: #ffffff;
-  --bg-offwhite: #faf9f6;
+  --bg-offwhite: #fbfaf6;
   
   /* 30% Structural Surfaces & Alabaster */
   --surface-card: #ffffff;
-  --surface-card-hover: #fdfcf9;
-  --surface-subtle: #f7f6f0;
-  --border-light: #e5dfd0;
-  --border-warm: #d8d1bf;
-  --border-gold-subtle: rgba(197, 155, 39, 0.35);
+  --surface-card-hover: #fdfcf7;
+  --surface-subtle: #f6f5ed;
+  --border-light: #e5dfcb;
+  --border-warm: #d5cca5;
+  --border-gold-subtle: rgba(184, 134, 11, 0.35);
   
-  /* Text Contrast Hierarchy */
-  --text-primary: #121316;
-  --text-secondary: #4a4e5a;
-  --text-muted: #717684;
-  --text-dim: #9aa0af;
+  /* Text Contrast Hierarchy (Deep rich charcoal for flawless reading) */
+  --text-primary: #111215;
+  --text-secondary: #3f424e;
+  --text-muted: #666c7d;
+  --text-dim: #8b92a2;
 
   /* 10% Pure Ethereal Gold Accent */
-  --gold-primary: #c59b27;
-  --gold-hover: #b38b1e;
-  --gold-bright: #dfb743;
-  --gold-glow: rgba(197, 155, 39, 0.15);
-  --gold-subtle-bg: rgba(197, 155, 39, 0.08);
+  --gold-primary: #b8860b;
+  --gold-hover: #a07408;
+  --gold-bright: #d4af37;
+  --gold-glow: rgba(184, 134, 11, 0.16);
+  --gold-subtle-bg: rgba(184, 134, 11, 0.08);
 
   /* Fonts */
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -45,18 +45,23 @@
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--bg-white);
+  background-color: #faf9f5;
   color: var(--text-primary);
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 
-  /* Subtle, elegant off-white + delicate gold micro-pattern design */
+  /* 
+    High-visibility forensic puzzle reconstruction background pattern:
+    - Geometric interlocking puzzle mesh & forensic coordinate grid in warm gold & off-white
+  */
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.07) 0%, transparent 60%),
-    radial-gradient(circle at 100% 100%, rgba(212, 175, 55, 0.04) 0%, transparent 50%),
-    radial-gradient(rgba(197, 155, 39, 0.12) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 32px 32px;
+    /* Gold ambient light source at the top */
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.12) 0%, transparent 65%),
+    radial-gradient(circle at 100% 100%, rgba(184, 134, 11, 0.06) 0%, transparent 50%),
+    /* Visible puzzle grid & fragment matrix SVG pattern */
+    url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23c59b27' stroke-width='0.75' stroke-opacity='0.16'%3E%3Cpath d='M0 40h25c0-4.5 3.5-8 8-8s8 3.5 8 8h39' /%3E%3Cpath d='M40 0v25c4.5 0 8 3.5 8 8s-3.5 8-8 8v39' /%3E%3Ccircle cx='40' cy='40' r='1.5' fill='%23c59b27' fill-opacity='0.25'/%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23c59b27' fill-opacity='0.25'/%3E%3Ccircle cx='80' cy='80' r='1.5' fill='%23c59b27' fill-opacity='0.25'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 100% 100%, 100% 100%, 80px 80px;
   background-attachment: fixed;
 }
 
@@ -73,12 +78,12 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-white);
+  background: #faf9f5;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d8d3c5;
+  background: #d8d0ba;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #c59b27;
+  background: #b8860b;
 }

@@ -1,33 +1,54 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Cpu, Layers, HardDrive, Check, Award } from 'lucide-react';
+import { 
+  ArrowRight, 
+  Cpu, 
+  HardDrive, 
+  Check, 
+  Award, 
+  Scan, 
+  Compass,
+  Boxes,
+  Lock
+} from 'lucide-react';
 
 const About = () => {
   return (
     <div className="about-container">
+      {/* Platform Specification Badge & Heading */}
       <div className="about-header">
-        <span className="badge-pill">PLATFORM SPECIFICATION</span>
-        <h1>About Fragment</h1>
+        <span className="badge-pill">PLATFORM SPECIFICATION & ARCHITECTURAL OVERVIEW</span>
+        <h1>The Science Behind Fragment</h1>
         <p>
-          An algorithmic workspace engineered to reconstruct shredded documents, scrambled images, and scattered jigsaw puzzle fragments without external subscriptions.
+          A forensic-grade, local-first engine designed to reconstruct shredded documents, fractured images, and complex jigsaw topologies through computer vision, boundary optimization, and genuine machine learning.
         </p>
       </div>
 
+      {/* Section 1: Executive Mission & Core Philosophy */}
       <div className="about-section">
-        <h2>Mission & Design Philosophy</h2>
+        <div className="section-label-gold">
+          <Compass size={16} />
+          <span>PROJECT IDENTITY & PURPOSE</span>
+        </div>
+        <h2>Why We Built Fragment</h2>
         <p>
-          Document reconstruction and digital puzzle solving are historically locked behind expensive proprietary forensics suites or complex academic codebases. Fragment unites classical image processing, optimization graphs, and machine learning into an accessible, hardware-conscious local desktop suite.
+          Historical document reconstruction and digital puzzle solving have traditionally been sequestered behind expensive proprietary forensics suites (costing thousands in enterprise licensing) or locked away in obscure academic research repositories.
+        </p>
+        <p style={{ marginTop: '0.85rem' }}>
+          <strong>Fragment changes that.</strong> We engineered a unified, consumer-hardware-friendly suite that runs 100% locally on your computer with zero paid subscriptions, zero API keys, and complete data privacy. Every piece of code is designed to tackle physical destruction—whether a shredded financial sheet, a water-damaged archival parchment, or a scrambled photo puzzle.
         </p>
       </div>
 
+      {/* Section 2: Deep 4-Pillar Architectural Breakdown */}
       <div className="about-grid">
         <div className="about-card">
           <div className="about-card-icon">
             <Cpu size={24} color="var(--gold-primary)" />
           </div>
-          <h3>Genuine Machine Learning</h3>
+          <h3>Genuine Machine Learning (Stage 4)</h3>
           <p>
-            Unlike static heuristic scripts, Fragment uses pairwise neighbor classifiers trained on synthetic image cuts. Edge gradients, color moments, and texture continuities inform probabilistic adjacency matrices.
+            Unlike naive heuristic scripts that merely compare raw RGB pixels, Fragment implements pairwise neighbor classifiers trained on synthetic cut datasets. Edge gradients, color moments, texture frequencies, and contour continuities are synthesized into probabilistic adjacency matrices.
           </p>
+          <div className="card-micro-tag">Scikit-Learn Classifier Pipeline</div>
         </div>
 
         <div className="about-card">
@@ -36,46 +57,122 @@ const About = () => {
           </div>
           <h3>Strict 8 GB RAM Guardrails</h3>
           <p>
-            Designed from day one to operate on everyday consumer laptops. Fragment avoids memory overhead by using indexed piece matrices, lazy thumbnail rendering, and streaming tile buffers.
+            Large image processing notoriously crashes consumer laptops through memory bloat. Fragment enforces strict memory budgets: images are split iteratively, compressed thumbnails are cached for UI rendering, and puzzle spatial calculations are executed via lightweight numeric ID matrices.
           </p>
+          <div className="card-micro-tag">Zero Memory Leaks</div>
         </div>
 
         <div className="about-card">
           <div className="about-card-icon">
-            <Layers size={24} color="var(--gold-primary)" />
+            <Lock size={24} color="var(--gold-primary)" />
           </div>
-          <h3>Deterministic Identity</h3>
+          <h3>Immutable Piece IDs</h3>
           <p>
-            Every fragment receives an unalterable canonical ID (e.g. <code>PIECE-0001</code>). Regardless of rotations, user swaps, or graph permutations, provenance remains traceable.
+            Every extracted fragment or shred is assigned a permanent, unalterable canonical ID (e.g. <code>PIECE-0001</code>). Even if a piece is manually dragged, rotated 90°, or re-evaluated by the solver, its cryptographic origin remains verifiable for auditability.
           </p>
+          <div className="card-micro-tag">Audit-Proof Provenance</div>
         </div>
 
         <div className="about-card">
           <div className="about-card-icon">
             <Award size={24} color="var(--gold-primary)" />
           </div>
-          <h3>100% Free & Open</h3>
+          <h3>100% Free & Zero-Cloud Dependent</h3>
           <p>
-            Zero API keys required. All computer vision algorithms (OpenCV), mathematical optimization (MST/Greedy), and ML models run locally in your environment.
+            Your sensitive files never upload to a black-box cloud server. All computer vision mathematics (OpenCV), graph traversal algorithms (Kruskal’s MST / Greedy solvers), and ML inferences execute directly within your local Python runtime.
           </p>
+          <div className="card-micro-tag">Local-First Sovereign Storage</div>
         </div>
       </div>
 
+      {/* Section 3: Technical Forensics Deep Dive (How the Engine Solves) */}
+      <div className="about-section">
+        <div className="section-label-gold">
+          <Scan size={16} />
+          <span>TECHNICAL WORKFLOW DEEP DIVE</span>
+        </div>
+        <h2>How Fragment Reconstructs Scattered Reality</h2>
+        <div className="methodology-steps">
+          <div className="method-step-row">
+            <div className="method-step-num">01</div>
+            <div>
+              <h4>Sub-Pixel Boundary Contour Analysis</h4>
+              <p>When an image or shred is ingested, our algorithms extract 1-pixel boundary slices across all 4 candidate edges (Top, Right, Bottom, Left). Color histograms and Sobel gradient derivatives are computed to profile the exact transition dynamics.</p>
+            </div>
+          </div>
+          <div className="method-step-row">
+            <div className="method-step-num">02</div>
+            <div>
+              <h4>Pairwise Compatibility Matrix Generation</h4>
+              <p>For an $N$-piece puzzle, our matching engine calculates an $O(N^2)$ distance matrix evaluating boundary compatibility using Sum-of-Squared Differences (SSD), Mahalanobis color distance, and machine learning neighborhood probabilities.</p>
+            </div>
+          </div>
+          <div className="method-step-row">
+            <div className="method-step-num">03</div>
+            <div>
+              <h4>Minimum Spanning Tree & Greedy Layout Placement</h4>
+              <p>The placement engine initializes the highest-confidence seed piece and expands outward using a maximum-weight spanning tree, locking confirmed neighbors into rigid clusters to prevent exponential search explosions.</p>
+            </div>
+          </div>
+          <div className="method-step-row">
+            <div className="method-step-num">04</div>
+            <div>
+              <h4>Interactive Human-in-the-Loop Refinement</h4>
+              <p>In Stage 6, users can visually inspect edge confidence scores, lock known anchors, rotate ambiguous shreds, and seamlessly override model predictions in real time.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Section 4: Comprehensive 11-Stage Roadmap */}
       <div className="roadmap-preview-box">
-        <h3>Development Stages Overview</h3>
+        <div className="section-label-gold">
+          <Boxes size={16} />
+          <span>DEVELOPMENT BLUEPRINT</span>
+        </div>
+        <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#121316', marginBottom: '1.25rem' }}>
+          Master 11-Stage Engineering Roadmap
+        </h3>
         <ul className="roadmap-list">
-          <li><Check size={18} color="var(--gold-primary)" /> <span><strong>Stage 1:</strong> Foundation, Architecture & Storage Scaffolding (Completed)</span></li>
-          <li><span className="bullet-active"></span> <span><strong>Stage 2:</strong> Image Processing, Tile Splitter & Piece Inventory (Active)</span></li>
-          <li><span className="bullet-queue"></span> <span><strong>Stage 3:</strong> Baseline Square-Tile Boundary Gradient Solver</span></li>
-          <li><span className="bullet-queue"></span> <span><strong>Stage 4:</strong> Synthetic Machine Learning Neighborhood Model</span></li>
-          <li><span className="bullet-queue"></span> <span><strong>Stage 8-11:</strong> Straight Strips, Cross-Cuts & Classic Jigsaw Puzzles</span></li>
+          <li>
+            <Check size={18} color="var(--gold-primary)" /> 
+            <span><strong>Stage 1 — Foundation (Completed):</strong> UI scaffolding, REST API endpoints, storage directories, and immutable ID generator.</span>
+          </li>
+          <li>
+            <span className="bullet-active"></span> 
+            <span><strong>Stage 2 — Image Processing & Tile Import (Active):</strong> Sub-image cropping, automatic grid partitioner ($R \times C$), piece thumbnailing, and piece inventory UI.</span>
+          </li>
+          <li>
+            <span className="bullet-queue"></span> 
+            <span><strong>Stage 3 — Baseline Square-Tile Solver:</strong> Classical CV color gradient matching (SSD) with greedy placement and toggleable Numbered Piece Maps.</span>
+          </li>
+          <li>
+            <span className="bullet-queue"></span> 
+            <span><strong>Stage 4 — Real Machine Learning Pipeline:</strong> Synthetic training generator, Scikit-learn pairwise classifier, and Model Lab accuracy metrics.</span>
+          </li>
+          <li>
+            <span className="bullet-queue"></span> 
+            <span><strong>Stage 5 — Multi-Photo Support & Known Anchors:</strong> Perceptual hashing (pHash) for deduplication and locked seed clusters.</span>
+          </li>
+          <li>
+            <span className="bullet-queue"></span> 
+            <span><strong>Stage 6 — Interactive Manual Correction:</strong> Drag-and-drop piece swapping, 90° tile rotations, undo/redo state history.</span>
+          </li>
+          <li>
+            <span className="bullet-queue"></span> 
+            <span><strong>Stage 7 — Persistence & Export Engine:</strong> High-res reconstruction export, Numbered Piece Map PNG, CSV placement table.</span>
+          </li>
+          <li>
+            <span className="bullet-queue"></span> 
+            <span><strong>Stage 8-11 — Advanced Fragmentation:</strong> Vertical strip contour shred detection, cross-cut OCR continuity, and organic jigsaw puzzle contour tabs/blanks.</span>
+          </li>
         </ul>
       </div>
 
-      <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
-        <Link to="/projects" className="btn btn-primary" style={{ padding: '0.75rem 1.75rem' }}>
-          <span>Open Projects Directory</span>
-          <ArrowRight size={16} />
+      <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+        <Link to="/projects" className="btn btn-primary" style={{ padding: '0.85rem 2rem', fontSize: '1rem' }}>
+          <span>Launch Your First Workspace</span>
+          <ArrowRight size={18} />
         </Link>
       </div>
     </div>
