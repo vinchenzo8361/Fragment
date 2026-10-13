@@ -29,14 +29,14 @@ const LandingHome = () => {
       {/* Feature / Capabilities Matrix */}
       <section className="landing-capabilities">
         <div className="capabilities-header">
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: '#fff' }}>Supported Reconstruction Engines</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Modular algorithms tailored to distinct fragmentation geometries.</p>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#121316' }}>Supported Reconstruction Engines</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Modular algorithms tailored to distinct fragmentation geometries.</p>
         </div>
 
         <div className="capabilities-grid">
           <div className="capability-card">
             <div className="capability-icon">
-              <Grid size={22} color="var(--gold-pure)" />
+              <Grid size={22} color="var(--gold-primary)" />
             </div>
             <h3>Square-Tile Matrix</h3>
             <p>Boundary color gradient differences, sum-of-squared differences (SSD), and minimum spanning tree placement solvers.</p>
@@ -45,7 +45,7 @@ const LandingHome = () => {
 
           <div className="capability-card">
             <div className="capability-icon">
-              <FileText size={22} color="var(--gold-pure)" />
+              <FileText size={22} color="var(--gold-primary)" />
             </div>
             <h3>Straight Shredded Paper</h3>
             <p>Contour detection for vertical shredded strips, skew angle correction, text stroke continuity, and horizontal 1D ordering.</p>
@@ -54,7 +54,7 @@ const LandingHome = () => {
 
           <div className="capability-card">
             <div className="capability-icon">
-              <Scissors size={22} color="var(--gold-pure)" />
+              <Scissors size={22} color="var(--gold-primary)" />
             </div>
             <h3>Cross-Cut Shreds</h3>
             <p>2D rectangular shred alignment, text baseline tracing via local OCR, and pairwise spatial constraint satisfaction.</p>
@@ -63,7 +63,7 @@ const LandingHome = () => {
 
           <div className="capability-card">
             <div className="capability-icon">
-              <Puzzle size={22} color="var(--gold-pure)" />
+              <Puzzle size={22} color="var(--gold-primary)" />
             </div>
             <h3>Classic Jigsaw</h3>
             <p>Organic contour analysis, tab and blank curve matching, border piece classification, and corner anchors.</p>
@@ -75,21 +75,21 @@ const LandingHome = () => {
       {/* Core Architectural Pillars */}
       <section className="landing-pillars">
         <div className="pillar-item">
-          <ShieldCheck size={20} color="var(--gold-pure)" />
+          <ShieldCheck size={24} color="var(--gold-primary)" />
           <div>
             <h4>100% Free & Local-First</h4>
             <p>Zero cloud APIs, zero subscription fees. Runs directly on your device with complete privacy.</p>
           </div>
         </div>
         <div className="pillar-item">
-          <Zap size={20} color="var(--gold-pure)" />
+          <Zap size={24} color="var(--gold-primary)" />
           <div>
             <h4>Optimized for 8 GB RAM</h4>
             <p>Batch tile streaming, numerical ID matrices, and thumbnail pipelining prevent memory saturation.</p>
           </div>
         </div>
         <div className="pillar-item">
-          <CheckCircle2 size={20} color="var(--gold-pure)" />
+          <CheckCircle2 size={24} color="var(--gold-primary)" />
           <div>
             <h4>Deterministic Piece IDs</h4>
             <p>Immutable canonical IDs (PIECE-XXXXXXXX) ensure verifiable reconstruction integrity.</p>

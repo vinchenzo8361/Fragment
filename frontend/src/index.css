@@ -1,36 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* 
-  Ethereal & Luminous Theme (Heaven / Angelic / Ivory & Pure Gold):
-  - 60% Dominant Base: Pure Luminous White (#FFFFFF), Warm Pearl Ivory (#FAF9F6, #FDFDFD)
-  - 30% Structural Secondary: Soft Alabaster Cards (#FFFFFF, #F5F4F0), Delicate Warm Grey Borders (#E8E6DF, #EFECE6)
-  - 10% Accent Focus: Regal Metallic Gold (#C59B27, #D4AF37, #E5C158) with Divine Warm Glows
+  Sharp Pure White, Ethereal Off-White & Radiant Pure Gold:
+  - 60% Dominant Base: Sharp, crisp pure white (#FFFFFF) with an intricate, subtle gold geometric dot matrix & radial aura
+  - 30% Structural Secondary: Warm Ivory & Alabaster cards (#FFFFFF, #FBFBF9), refined gold-infused borders (#E5DFD0, #D9D2BF)
+  - 10% Accent Focus: Metallic Radiant Gold (#C59B27, #D4AF37)
 */
 :root {
   /* 60% Base */
   --bg-white: #ffffff;
-  --bg-ivory: #faf9f5;
-  --bg-ethereal: #f6f5ef;
+  --bg-offwhite: #faf9f6;
   
   /* 30% Structural Surfaces & Alabaster */
   --surface-card: #ffffff;
-  --surface-card-hover: #fcfbf7;
-  --surface-subtle: #f4f3ec;
-  --border-light: #e6e3da;
-  --border-warm: #ddd9cd;
-  --border-gold-subtle: rgba(197, 155, 39, 0.28);
+  --surface-card-hover: #fdfcf9;
+  --surface-subtle: #f7f6f0;
+  --border-light: #e5dfd0;
+  --border-warm: #d8d1bf;
+  --border-gold-subtle: rgba(197, 155, 39, 0.35);
   
-  /* Text Contrast Hierarchy (Crisp Deep Charcoal for optimal legibility) */
-  --text-primary: #18191c;
-  --text-secondary: #575a65;
-  --text-muted: #7d8290;
-  --text-dim: #9ea3b0;
+  /* Text Contrast Hierarchy */
+  --text-primary: #121316;
+  --text-secondary: #4a4e5a;
+  --text-muted: #717684;
+  --text-dim: #9aa0af;
 
   /* 10% Pure Ethereal Gold Accent */
   --gold-primary: #c59b27;
-  --gold-hover: #b58d20;
+  --gold-hover: #b38b1e;
   --gold-bright: #dfb743;
-  --gold-glow: rgba(197, 155, 39, 0.12);
+  --gold-glow: rgba(197, 155, 39, 0.15);
   --gold-subtle-bg: rgba(197, 155, 39, 0.08);
 
   /* Fonts */
@@ -46,14 +45,18 @@
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--bg-ivory);
+  background-color: var(--bg-white);
   color: var(--text-primary);
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+
+  /* Subtle, elegant off-white + delicate gold micro-pattern design */
   background-image: 
-    radial-gradient(circle at 10% 0%, rgba(212, 175, 55, 0.04) 0%, transparent 40%),
-    radial-gradient(circle at 90% 100%, rgba(229, 193, 88, 0.05) 0%, transparent 50%);
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.07) 0%, transparent 60%),
+    radial-gradient(circle at 100% 100%, rgba(212, 175, 55, 0.04) 0%, transparent 50%),
+    radial-gradient(rgba(197, 155, 39, 0.12) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 32px 32px;
   background-attachment: fixed;
 }
 
@@ -70,10 +73,10 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-ivory);
+  background: var(--bg-white);
 }
 ::-webkit-scrollbar-thumb {
-  background: #dcd7ca;
+  background: #d8d3c5;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {

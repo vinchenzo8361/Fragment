@@ -68,29 +68,29 @@ const ProjectsList = () => {
       {/* Projects Section */}
       <div className="section-header-bar">
         <h2 className="section-title">
-          <Folder size={18} color="var(--gold-pure)" />
+          <Folder size={20} color="var(--gold-primary)" />
           <span>All Workspaces</span>
         </h2>
-        <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
+        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
           {projects.length} {projects.length === 1 ? 'WORKSPACE' : 'WORKSPACES'}
         </span>
       </div>
 
       {loading ? (
         <div className="empty-state-box">
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Loading project registry...</p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Loading project registry...</p>
         </div>
       ) : projects.length === 0 ? (
         <div className="empty-state-box">
-          <div style={{ width: 44, height: 44, margin: '0 auto 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, background: 'var(--surface-navy)', color: 'var(--gold-pure)' }}>
-            <Folder size={20} />
+          <div style={{ width: 48, height: 48, margin: '0 auto 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, background: 'var(--gold-subtle-bg)', border: '1px solid var(--border-gold-subtle)', color: 'var(--gold-primary)' }}>
+            <Folder size={24} />
           </div>
-          <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '0.4rem', color: '#fff' }}>No Projects Created Yet</h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', maxWidth: 440, margin: '0 auto 1.5rem' }}>
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.4rem', color: '#121316' }}>No Projects Created Yet</h3>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', maxWidth: 440, margin: '0 auto 1.5rem' }}>
             Click below to start your first project and configure a reconstruction grid.
           </p>
           <Link to="/setup" className="btn btn-primary">
-            <Plus size={15} />
+            <Plus size={16} />
             <span>Create First Project</span>
           </Link>
         </div>
@@ -106,11 +106,11 @@ const ProjectsList = () => {
                 <div className="project-card-id">{p.id}</div>
                 <div className="project-meta-row">
                   <div className="meta-item">
-                    <ImageIcon size={14} />
+                    <ImageIcon size={15} color="var(--gold-primary)" />
                     <span>{p.images ? p.images.length : 0} Sources</span>
                   </div>
                   <div className="meta-item">
-                    <Grid size={14} />
+                    <Grid size={15} color="var(--gold-primary)" />
                     <span>{p.grid_rows && p.grid_cols ? `${p.grid_rows}×${p.grid_cols} Grid` : 'Dynamic'}</span>
                   </div>
                 </div>

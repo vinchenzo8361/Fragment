@@ -22,7 +22,7 @@ const About = () => {
       <div className="about-grid">
         <div className="about-card">
           <div className="about-card-icon">
-            <Cpu size={22} color="var(--gold-pure)" />
+            <Cpu size={24} color="var(--gold-primary)" />
           </div>
           <h3>Genuine Machine Learning</h3>
           <p>
@@ -32,7 +32,7 @@ const About = () => {
 
         <div className="about-card">
           <div className="about-card-icon">
-            <HardDrive size={22} color="var(--gold-pure)" />
+            <HardDrive size={24} color="var(--gold-primary)" />
           </div>
           <h3>Strict 8 GB RAM Guardrails</h3>
           <p>
@@ -42,7 +42,7 @@ const About = () => {
 
         <div className="about-card">
           <div className="about-card-icon">
-            <Layers size={22} color="var(--gold-pure)" />
+            <Layers size={24} color="var(--gold-primary)" />
           </div>
           <h3>Deterministic Identity</h3>
           <p>
@@ -52,7 +52,7 @@ const About = () => {
 
         <div className="about-card">
           <div className="about-card-icon">
-            <Award size={22} color="var(--gold-pure)" />
+            <Award size={24} color="var(--gold-primary)" />
           </div>
           <h3>100% Free & Open</h3>
           <p>
@@ -64,7 +64,7 @@ const About = () => {
       <div className="roadmap-preview-box">
         <h3>Development Stages Overview</h3>
         <ul className="roadmap-list">
-          <li><Check size={16} color="var(--gold-pure)" /> <span><strong>Stage 1:</strong> Foundation, Architecture & Storage Scaffolding (Completed)</span></li>
+          <li><Check size={18} color="var(--gold-primary)" /> <span><strong>Stage 1:</strong> Foundation, Architecture & Storage Scaffolding (Completed)</span></li>
           <li><span className="bullet-active"></span> <span><strong>Stage 2:</strong> Image Processing, Tile Splitter & Piece Inventory (Active)</span></li>
           <li><span className="bullet-queue"></span> <span><strong>Stage 3:</strong> Baseline Square-Tile Boundary Gradient Solver</span></li>
           <li><span className="bullet-queue"></span> <span><strong>Stage 4:</strong> Synthetic Machine Learning Neighborhood Model</span></li>
@@ -72,7 +72,7 @@ const About = () => {
         </ul>
       </div>
 
-      <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+      <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
         <Link to="/projects" className="btn btn-primary" style={{ padding: '0.75rem 1.75rem' }}>
           <span>Open Projects Directory</span>
           <ArrowRight size={16} />
