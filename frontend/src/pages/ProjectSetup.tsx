@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Grid, FileText, Scissors, Puzzle, Sparkles, ArrowRight } from 'lucide-react';
+import { Grid, FileText, Scissors, Puzzle } from 'lucide-react';
 import { createProject } from '../api';
 
 const ProjectSetup = () => {
@@ -15,31 +15,30 @@ const ProjectSetup = () => {
     {
       id: 'square-tile',
       title: 'Square-Tile Grid',
-      desc: 'Uniform NxN matrix cuts with edge gradient alignment.',
-      icon: <Grid size={20} />,
+      desc: 'Uniform row × column image matrix with boundary gradient solving.',
+      icon: <Grid size={18} />,
       enabled: true,
     },
     {
       id: 'straight-strip',
-      title: 'Straight Shreds',
+      title: 'Straight Shredded Paper',
       desc: 'Vertical ribbon shredded documents and OCR text continuity.',
-      icon: <FileText size={20} />,
+      icon: <FileText size={18} />,
       enabled: true,
     },
     {
       id: 'cross-cut',
-      title: 'Cross-Cut Shreds',
-      desc: '2D confetti particle matching & text line reconstruction.',
-      icon: <Scissors size={20} />,
+      title: 'Cross-Cut Shredded Paper',
+      desc: '2D rectangular particle reconstruction and alignment.',
+      icon: <Scissors size={18} />,
       enabled: true,
     },
     {
       id: 'traditional',
       title: 'Classic Jigsaw',
-      desc: 'Organic contour analysis with interlock tab/blank detection.',
-      icon: <Puzzle size={20} />,
+      desc: 'Curved interlocking contour and tab/blank analysis.',
+      icon: <Puzzle size={18} />,
       enabled: false,
-      tag: 'Coming Soon',
     },
   ];
 
@@ -58,72 +57,68 @@ const ProjectSetup = () => {
       navigate(`/workspace/${res.data.id}`);
     } catch (err) {
       console.error(err);
-      alert('Could not initialize project. Please verify backend is running.');
+      alert('Could not initialize project. Verify that the local backend is running.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="setup-page-container">
+    <div className="setup-container">
       <div className="setup-card">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#818cf8', marginBottom: '0.5rem' }}>
-          <Sparkles size={16} />
-          <span style={{ fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            New Investigation
-          </span>
-        </div>
-        <h2 className="setup-card-title">Configure Workspace</h2>
-        <p className="setup-card-desc">
-          Select your fragmentation style and parameters to initialize a reconstruction pipeline.
+        <h2 className="setup-title">New Project</h2>
+        <p className="setup-description">
+          Set up a new reconstruction project and specify the fragmentation type.
         </p>
 
-        <form onSubmit={handleSubmit} className="setup-form">
-          <div className="form-field">
-            <label className="form-label">Workspace / Project Title</label>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">Project Name</label>
             <input 
               type="text" 
               className="form-input"
               value={name} 
               onChange={(e) => setName(e.target.value)} 
               required 
-              placeholder="e.g. Document Fracture #412"
+              placeholder="e.g. Test Pattern 01"
               autoFocus
             />
           </div>
 
-          <div className="form-field">
+          <div className="form-group">
             <label className="form-label">Reconstruction Type</label>
-            <div className="puzzle-type-grid">
+            <div className="type-options-list">
               {puzzleTypes.map((t) => (
                 <div 
                   key={t.id}
-                  className={`puzzle-type-card ${puzzleType === t.id ? 'selected' : ''} ${!t.enabled ? 'disabled' : ''}`}
+                  className={`type-option-item ${puzzleType === t.id ? 'selected' : ''} ${!t.enabled ? 'disabled' : ''}`}
                   onClick={() => t.enabled && setPuzzleType(t.id)}
                 >
-                  <div className="type-card-icon">
-                    {t.icon}
+                  <div className="type-option-main">
+                    <div style={{ color: puzzleType === t.id ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
+                      {t.icon}
+                    </div>
+                    <div>
+                      <div className="type-option-name">{t.title}</div>
+                      <div className="type-option-desc">{t.desc}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="type-card-name">{t.title}</div>
-                    {t.tag && (
-                      <span style={{ fontSize: '0.65rem', color: '#f59e0b', fontFamily: 'var(--font-mono)' }}>
-                        {t.tag}
-                      </span>
-                    )}
-                  </div>
-                  <div className="type-card-desc">{t.desc}</div>
+                  {!t.enabled && (
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontFamily: 'var(--font-mono)' }}>
+                      Planned
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
           </div>
 
           {puzzleType === 'square-tile' && (
-            <div className="form-field">
-              <label className="form-label">Initial Grid Partition</label>
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <div style={{ flex: 1 }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Rows</span>
+            <div className="form-group">
+              <label className="form-label">Grid Partition</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Rows</span>
                   <input 
                     type="number" 
                     min={2} 
@@ -134,8 +129,8 @@ const ProjectSetup = () => {
                     style={{ marginTop: '0.25rem' }}
                   />
                 </div>
-                <div style={{ flex: 1 }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Columns</span>
+                <div>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Columns</span>
                   <input 
                     type="number" 
                     min={2} 
@@ -150,15 +145,20 @@ const ProjectSetup = () => {
             </div>
           )}
 
-          <div style={{ marginTop: '1rem' }}>
+          <div style={{ marginTop: '1.75rem', display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+            <button 
+              type="button" 
+              className="btn btn-secondary"
+              onClick={() => navigate('/')}
+            >
+              Cancel
+            </button>
             <button 
               type="submit" 
               className="btn btn-primary" 
               disabled={loading}
-              style={{ width: '100%', padding: '0.9rem' }}
             >
-              <span>{loading ? 'Initializing Studio...' : 'Launch Workspace'}</span>
-              <ArrowRight size={16} />
+              {loading ? 'Creating...' : 'Create Project'}
             </button>
           </div>
         </form>

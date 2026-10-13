@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Layers, Plus, Compass } from 'lucide-react';
+import { Layers, Folder, Plus } from 'lucide-react';
 import Home from './pages/Home';
 import ProjectSetup from './pages/ProjectSetup';
 import Workspace from './pages/Workspace';
@@ -11,9 +11,9 @@ function NavigationBar() {
   return (
     <nav className="navbar">
       <div className="nav-left">
-        {/* Sleek Logo Icon without text as requested */}
-        <Link to="/" className="nav-logo-icon" title="Home">
-          <Layers size={20} />
+        {/* Brand icon only, no text */}
+        <Link to="/" className="nav-logo-icon" title="Workspaces">
+          <Layers size={18} />
         </Link>
         
         <div className="nav-links">
@@ -21,23 +21,23 @@ function NavigationBar() {
             to="/" 
             className={`nav-item ${location.pathname === '/' ? 'active' : ''}`}
           >
-            <Compass size={15} />
-            Projects
+            <Folder size={15} />
+            <span>Workspaces</span>
           </Link>
           <Link 
             to="/setup" 
             className={`nav-item ${location.pathname === '/setup' ? 'active' : ''}`}
           >
             <Plus size={15} />
-            New Workspace
+            <span>New Project</span>
           </Link>
         </div>
       </div>
 
       <div className="nav-right">
         <div className="nav-status-pill">
-          <span className="pulse-dot"></span>
-          <span>ENGINE READY</span>
+          <div className="status-indicator"></div>
+          <span>LOCAL ENGINE</span>
         </div>
       </div>
     </nav>
@@ -49,7 +49,7 @@ function App() {
     <Router>
       <div className="app-container">
         <NavigationBar />
-        <main className="main-content">
+        <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/setup" element={<ProjectSetup />} />
