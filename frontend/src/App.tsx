@@ -11,7 +11,7 @@ function App() {
       <div className="app-container">
         <nav className="navbar">
           <div className="nav-brand">
-            <Link to="/">Image Solver</Link>
+            <Link to="/">Fragment</Link>
           </div>
           <div className="nav-links">
             <Link to="/">Home</Link>

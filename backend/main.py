@@ -5,7 +5,7 @@ import os
 
 from projects.router import router as projects_router
 
-app = FastAPI(title="Image Solver API", description="API for reconstructing scattered images and puzzles.")
+app = FastAPI(title="Fragment API", description="API for reconstructing scattered images and puzzles.")
 
 app.add_middleware(
     CORSMiddleware,
@@ -23,7 +23,7 @@ app.mount("/data", StaticFiles(directory="data"), name="data")
 
 @app.get("/")
 def read_root():
-    return {"message": "Image Solver API is running"}
+    return {"message": "Fragment API is running"}
 
 @app.get("/health")
 def health_check():

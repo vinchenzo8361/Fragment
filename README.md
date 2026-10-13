@@ -1,6 +1,6 @@
-# Image Solver
+# Fragment
 
-**Image Solver** is a functional web application designed to reconstruct original images from scattered, shuffled, shredded, or partially assembled pieces. It uses computer vision, image processing, optimization algorithms, and machine learning.
+**Fragment** is a functional web application designed to reconstruct original images from scattered, shuffled, shredded, or partially assembled pieces. It uses computer vision, image processing, optimization algorithms, and machine learning.
 
 ## Project Structure
 
