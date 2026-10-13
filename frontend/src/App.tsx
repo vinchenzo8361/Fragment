@@ -1,11 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Layers, Folder, Plus, Info, User } from 'lucide-react';
+import { Folder, Plus, Info, User } from 'lucide-react';
 import LandingHome from './pages/LandingHome';
 import About from './pages/About';
 import ProjectsList from './pages/ProjectsList';
 import ProjectSetup from './pages/ProjectSetup';
 import Workspace from './pages/Workspace';
 import Login from './pages/Login';
+import ScrollToTop from './ScrollToTop';
 import './App.css';
 
 function NavigationBar() {
@@ -14,11 +15,7 @@ function NavigationBar() {
   return (
     <nav className="navbar">
       <div className="nav-left">
-        {/* Brand Icon: links back to Home */}
-        <Link to="/" className="nav-logo-icon" title="Fragment Home">
-          <Layers size={18} />
-        </Link>
-        
+        {/* Layer icon removed as requested - Clean text-based Home and tab nav */}
         <div className="nav-links">
           <Link 
             to="/" 
@@ -31,21 +28,21 @@ function NavigationBar() {
             className={`nav-item ${location.pathname === '/about' ? 'active' : ''}`}
           >
             <Info size={14} />
-            About
+            <span>About</span>
           </Link>
           <Link 
             to="/projects" 
             className={`nav-item ${location.pathname === '/projects' ? 'active' : ''}`}
           >
             <Folder size={14} />
-            Workspaces
+            <span>Workspaces</span>
           </Link>
           <Link 
             to="/setup" 
             className={`nav-item ${location.pathname === '/setup' ? 'active' : ''}`}
           >
             <Plus size={14} />
-            New Project
+            <span>New Project</span>
           </Link>
         </div>
       </div>
@@ -67,6 +64,7 @@ function NavigationBar() {
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <div className="app-container">
         <NavigationBar />
         <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>

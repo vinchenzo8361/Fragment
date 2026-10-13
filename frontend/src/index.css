@@ -1,38 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* 
-  High-End Executive Luxury & Precision Palette:
-  - 60% Dominant Base: Pure Deep Black (#000000, #08080a)
-  - 30% Structural Secondary: Off-Black & Dark Charcoal Surfaces (#111216, #181920) with Dark Navy (#101728, #162035)
-  - 5-8% Pure Gold Accents: Metallic Pure Gold (#D4AF37, #F59E0B) for sharp, deliberate points of focus
+  Ethereal & Luminous Theme (Heaven / Angelic / Ivory & Pure Gold):
+  - 60% Dominant Base: Pure Luminous White (#FFFFFF), Warm Pearl Ivory (#FAF9F6, #FDFDFD)
+  - 30% Structural Secondary: Soft Alabaster Cards (#FFFFFF, #F5F4F0), Delicate Warm Grey Borders (#E8E6DF, #EFECE6)
+  - 10% Accent Focus: Regal Metallic Gold (#C59B27, #D4AF37, #E5C158) with Divine Warm Glows
 */
 :root {
   /* 60% Base */
-  --bg-black: #000000;
-  --bg-offblack: #090a0d;
+  --bg-white: #ffffff;
+  --bg-ivory: #faf9f5;
+  --bg-ethereal: #f6f5ef;
   
-  /* 30% Structural Surfaces & Navy */
-  --surface-panel: #111318;
-  --surface-panel-hover: #161922;
-  --surface-navy: #0f172a;
-  --surface-navy-subtle: #131d36;
-  --border-dark: #1e222d;
-  --border-navy: #1e293b;
-  --border-gold-subtle: rgba(212, 175, 55, 0.3);
+  /* 30% Structural Surfaces & Alabaster */
+  --surface-card: #ffffff;
+  --surface-card-hover: #fcfbf7;
+  --surface-subtle: #f4f3ec;
+  --border-light: #e6e3da;
+  --border-warm: #ddd9cd;
+  --border-gold-subtle: rgba(197, 155, 39, 0.28);
   
-  /* Text Contrast Hierarchy */
-  --text-white: #ffffff;
-  --text-muted: #9ca3af;
-  --text-dim: #525866;
+  /* Text Contrast Hierarchy (Crisp Deep Charcoal for optimal legibility) */
+  --text-primary: #18191c;
+  --text-secondary: #575a65;
+  --text-muted: #7d8290;
+  --text-dim: #9ea3b0;
 
-  /* 5-8% Pure Gold Accent Focus */
-  --gold-pure: #d4af37;
-  --gold-bright: #e6c34f;
-  --gold-glow: rgba(212, 175, 55, 0.15);
-  --gold-border: #d4af37;
-  
-  --navy-accent: #1e3a8a;
-  --navy-accent-hover: #1e40af;
+  /* 10% Pure Ethereal Gold Accent */
+  --gold-primary: #c59b27;
+  --gold-hover: #b58d20;
+  --gold-bright: #dfb743;
+  --gold-glow: rgba(197, 155, 39, 0.12);
+  --gold-subtle-bg: rgba(197, 155, 39, 0.08);
 
   /* Fonts */
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -47,11 +46,15 @@
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--bg-black);
-  color: var(--text-white);
+  background-color: var(--bg-ivory);
+  color: var(--text-primary);
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  background-image: 
+    radial-gradient(circle at 10% 0%, rgba(212, 175, 55, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 90% 100%, rgba(229, 193, 88, 0.05) 0%, transparent 50%);
+  background-attachment: fixed;
 }
 
 #root {
@@ -61,18 +64,18 @@ body {
   flex-direction: column;
 }
 
-/* Precision scrollbars */
+/* Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-black);
+  background: var(--bg-ivory);
 }
 ::-webkit-scrollbar-thumb {
-  background: #232733;
-  border-radius: 3px;
+  background: #dcd7ca;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #373e52;
+  background: #c59b27;
 }
