@@ -1,36 +1,39 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* 
-  Refined Angelic / Ethereal Luxury:
-  - 60% Dominant Base: Pure White (#FFFFFF) with clearly visible subtle gold puzzle-mesh patterns
-  - 30% Structural Secondary: Off-White / Alabaster Cards (#FCFCF9), Warm Ivory (#F7F6F0), Gold-accented Navy / Slate Navbar
-  - 10% Pure Gold Accents: Metallic Radiant Gold (#B8860B, #C59B27, #D4AF37)
+  Refined Palette:
+  - Base: Warm Architectural Alabaster & Off-White (#F7F6F1, #FAF9F5)
+  - Cards: Crisp Pearl White (#FFFFFF)
+  - Borders: Warm Stone Greige (#E4DFD5)
+  - Subtle Gold Accent: Soft Metallic Gold (#B8860B) used sparingly (<5%)
+  - Visible Forensic Pattern: Organic jigsaw tabs & puzzle geometry watermark
 */
 :root {
-  /* 60% Base */
+  /* Dominant Base & Warm Off-White */
+  --bg-base: #f7f6f1;
+  --bg-offwhite: #faf9f5;
   --bg-white: #ffffff;
-  --bg-offwhite: #fbfaf6;
   
-  /* 30% Structural Surfaces & Alabaster */
+  /* Structural Surfaces */
   --surface-card: #ffffff;
-  --surface-card-hover: #fdfcf7;
-  --surface-subtle: #f6f5ed;
-  --border-light: #e5dfcb;
-  --border-warm: #d5cca5;
-  --border-gold-subtle: rgba(184, 134, 11, 0.35);
+  --surface-card-hover: #fbfaf5;
+  --surface-subtle: #f2f0e8;
+  --border-light: #e4dfd5;
+  --border-warm: #d5cebf;
+  --border-gold-subtle: rgba(184, 134, 11, 0.25);
   
-  /* Text Contrast Hierarchy (Deep rich charcoal for flawless reading) */
-  --text-primary: #111215;
-  --text-secondary: #3f424e;
-  --text-muted: #666c7d;
-  --text-dim: #8b92a2;
+  /* Text Contrast Hierarchy */
+  --text-primary: #14161a;
+  --text-secondary: #454854;
+  --text-muted: #6e7382;
+  --text-dim: #9297a6;
 
-  /* 10% Pure Ethereal Gold Accent */
+  /* Restrained Metallic Gold Accent (<5%) */
   --gold-primary: #b8860b;
-  --gold-hover: #a07408;
+  --gold-hover: #a17507;
   --gold-bright: #d4af37;
-  --gold-glow: rgba(184, 134, 11, 0.16);
-  --gold-subtle-bg: rgba(184, 134, 11, 0.08);
+  --gold-glow: rgba(184, 134, 11, 0.12);
+  --gold-subtle-bg: rgba(184, 134, 11, 0.06);
 
   /* Fonts */
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -45,23 +48,21 @@
 
 body {
   font-family: var(--font-sans);
-  background-color: #faf9f5;
+  background-color: var(--bg-base);
   color: var(--text-primary);
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 
   /* 
-    High-visibility forensic puzzle reconstruction background pattern:
-    - Geometric interlocking puzzle mesh & forensic coordinate grid in warm gold & off-white
+    Organic Jigsaw & Forensic Fragment Pattern:
+    - Subtle curved jigsaw tabs & interlocking puzzle nodes
+    - Warm off-white with delicate stone-gold outlines
   */
   background-image: 
-    /* Gold ambient light source at the top */
-    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.12) 0%, transparent 65%),
-    radial-gradient(circle at 100% 100%, rgba(184, 134, 11, 0.06) 0%, transparent 50%),
-    /* Visible puzzle grid & fragment matrix SVG pattern */
-    url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23c59b27' stroke-width='0.75' stroke-opacity='0.16'%3E%3Cpath d='M0 40h25c0-4.5 3.5-8 8-8s8 3.5 8 8h39' /%3E%3Cpath d='M40 0v25c4.5 0 8 3.5 8 8s-3.5 8-8 8v39' /%3E%3Ccircle cx='40' cy='40' r='1.5' fill='%23c59b27' fill-opacity='0.25'/%3E%3Ccircle cx='0' cy='0' r='1.5' fill='%23c59b27' fill-opacity='0.25'/%3E%3Ccircle cx='80' cy='80' r='1.5' fill='%23c59b27' fill-opacity='0.25'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 100% 100%, 100% 100%, 80px 80px;
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.05) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23b8860b' stroke-width='0.8' stroke-opacity='0.12'%3E%3Cpath d='M0 60h40c0-7 6-12 12-12s12 5 12 12h56' /%3E%3Cpath d='M60 0v40c7 0 12 6 12 12s-5 12-12 12v56' /%3E%3Cpath d='M30 30c6 0 10-4 10-10s-4-10-10-10' stroke-opacity='0.08' /%3E%3Cpath d='M90 90c-6 0-10 4-10 10s4 10 10 10' stroke-opacity='0.08' /%3E%3Ccircle cx='60' cy='60' r='2' fill='%23b8860b' fill-opacity='0.18'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 100% 100%, 120px 120px;
   background-attachment: fixed;
 }
 
@@ -78,10 +79,10 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #faf9f5;
+  background: var(--bg-base);
 }
 ::-webkit-scrollbar-thumb {
-  background: #d8d0ba;
+  background: #d4cebf;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {

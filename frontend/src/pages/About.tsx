@@ -44,11 +44,11 @@ const About = () => {
           <div className="about-card-icon">
             <Cpu size={24} color="var(--gold-primary)" />
           </div>
-          <h3>Genuine Machine Learning (Stage 4)</h3>
+          <h3>Machine Learning Pipeline (Future Phase)</h3>
           <p>
-            Unlike naive heuristic scripts that merely compare raw RGB pixels, Fragment implements pairwise neighbor classifiers trained on synthetic cut datasets. Edge gradients, color moments, texture frequencies, and contour continuities are synthesized into probabilistic adjacency matrices.
+            Unlike naive heuristic scripts that merely compare raw RGB pixels, Fragment will implement pairwise neighbor classifiers trained on synthetic cut datasets in later stages. Edge gradients, color moments, texture frequencies, and contour continuities are synthesized into probabilistic adjacency matrices.
           </p>
-          <div className="card-micro-tag">Scikit-Learn Classifier Pipeline</div>
+          <div className="card-micro-tag">Planned for Later Phases</div>
         </div>
 
         <div className="about-card">
@@ -79,7 +79,7 @@ const About = () => {
           </div>
           <h3>100% Free & Zero-Cloud Dependent</h3>
           <p>
-            Your sensitive files never upload to a black-box cloud server. All computer vision mathematics (OpenCV), graph traversal algorithms (Kruskal’s MST / Greedy solvers), and ML inferences execute directly within your local Python runtime.
+            Your sensitive files never upload to a black-box cloud server. All computer vision mathematics (OpenCV), graph traversal algorithms (Kruskal’s MST / Greedy solvers), and ML models execute directly within your local Python runtime.
           </p>
           <div className="card-micro-tag">Local-First Sovereign Storage</div>
         </div>
@@ -104,7 +104,7 @@ const About = () => {
             <div className="method-step-num">02</div>
             <div>
               <h4>Pairwise Compatibility Matrix Generation</h4>
-              <p>For an $N$-piece puzzle, our matching engine calculates an $O(N^2)$ distance matrix evaluating boundary compatibility using Sum-of-Squared Differences (SSD), Mahalanobis color distance, and machine learning neighborhood probabilities.</p>
+              <p>For an $N$-piece puzzle, our matching engine calculates an $O(N^2)$ distance matrix evaluating boundary compatibility using Sum-of-Squared Differences (SSD), Mahalanobis color distance, and neighborhood probabilities.</p>
             </div>
           </div>
           <div className="method-step-row">
@@ -124,47 +124,146 @@ const About = () => {
         </div>
       </div>
 
-      {/* Section 4: Comprehensive 11-Stage Roadmap */}
+      {/* Section 4: Master 11-Stage Roadmap with Technical & Layman Explanations */}
       <div className="roadmap-preview-box">
         <div className="section-label-gold">
           <Boxes size={16} />
-          <span>DEVELOPMENT BLUEPRINT</span>
+          <span>COMPLETE MASTER ROADMAP</span>
         </div>
-        <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#121316', marginBottom: '1.25rem' }}>
+        <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#14161a', marginBottom: '1.5rem' }}>
           Master 11-Stage Engineering Roadmap
         </h3>
         <ul className="roadmap-list">
+          {/* Stage 1 */}
           <li>
             <Check size={18} color="var(--gold-primary)" /> 
-            <span><strong>Stage 1 — Foundation (Completed):</strong> UI scaffolding, REST API endpoints, storage directories, and immutable ID generator.</span>
+            <div>
+              <div style={{ fontWeight: 700, color: '#14161a', fontSize: '0.95rem' }}>Stage 1 — Foundation & Architecture (Completed)</div>
+              <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                <strong>Plain English:</strong> Sets up the app, pages, buttons, and safe storage folders so you can create new projects cleanly.<br />
+                <strong>Technical Details:</strong> React 19 + TypeScript frontend with client-side state caching; FastAPI backend with schema validation and permanent PROJ-XXXXXXXX ID generation.
+              </div>
+            </div>
           </li>
+
+          {/* Stage 2 */}
           <li>
             <span className="bullet-active"></span> 
-            <span><strong>Stage 2 — Image Processing & Tile Import (Active):</strong> Sub-image cropping, automatic grid partitioner ($R \times C$), piece thumbnailing, and piece inventory UI.</span>
+            <div>
+              <div style={{ fontWeight: 700, color: '#14161a', fontSize: '0.95rem' }}>Stage 2 — Image Processing & Tile Import (Active Phase)</div>
+              <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                <strong>Plain English:</strong> Upload any picture and slice it into a grid of puzzle pieces with instant thumbnails you can inspect.<br />
+                <strong>Technical Details:</strong> Pillow/OpenCV image slicer creating bounded sub-crops, emitting permanent PIECE-0001 IDs, and generating lightweight thumbnail buffers without RAM leaks.
+              </div>
+            </div>
           </li>
+
+          {/* Stage 3 */}
           <li>
             <span className="bullet-queue"></span> 
-            <span><strong>Stage 3 — Baseline Square-Tile Solver:</strong> Classical CV color gradient matching (SSD) with greedy placement and toggleable Numbered Piece Maps.</span>
+            <div>
+              <div style={{ fontWeight: 700, color: '#14161a', fontSize: '0.95rem' }}>Stage 3 — Baseline Square-Tile Solver</div>
+              <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                <strong>Plain English:</strong> Solves the puzzle by checking which piece edges have matching colors, like connecting dominoes.<br />
+                <strong>Technical Details:</strong> Sum-of-Squared Differences (SSD) color gradient boundary matching combined with a greedy Minimum Spanning Tree (MST) coordinate placement solver.
+              </div>
+            </div>
           </li>
+
+          {/* Stage 4 */}
           <li>
             <span className="bullet-queue"></span> 
-            <span><strong>Stage 4 — Real Machine Learning Pipeline:</strong> Synthetic training generator, Scikit-learn pairwise classifier, and Model Lab accuracy metrics.</span>
+            <div>
+              <div style={{ fontWeight: 700, color: '#14161a', fontSize: '0.95rem' }}>Stage 4 — Real Machine Learning Pipeline (Later Phase)</div>
+              <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                <strong>Plain English:</strong> An AI model learns what real piece borders look like from hundreds of example photos to make smarter neighbor guesses.<br />
+                <strong>Technical Details:</strong> Synthetic training data generator feeding Scikit-learn random forests or SVMs to predict binary neighbor adjacency probabilities with confusion matrix metrics.
+              </div>
+            </div>
           </li>
+
+          {/* Stage 5 */}
           <li>
             <span className="bullet-queue"></span> 
-            <span><strong>Stage 5 — Multi-Photo Support & Known Anchors:</strong> Perceptual hashing (pHash) for deduplication and locked seed clusters.</span>
+            <div>
+              <div style={{ fontWeight: 700, color: '#14161a', fontSize: '0.95rem' }}>Stage 5 — Multi-Photo Support & Known Anchors</div>
+              <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                <strong>Plain English:</strong> If you take multiple photos of the same puzzle piece, it ignores duplicates and lets you lock pieces you know are right.<br />
+                <strong>Technical Details:</strong> Perceptual hashing (pHash) for image deduplication and an anchor graph constraint engine to fix pre-solved clusters in place.
+              </div>
+            </div>
           </li>
+
+          {/* Stage 6 */}
           <li>
             <span className="bullet-queue"></span> 
-            <span><strong>Stage 6 — Interactive Manual Correction:</strong> Drag-and-drop piece swapping, 90° tile rotations, undo/redo state history.</span>
+            <div>
+              <div style={{ fontWeight: 700, color: '#14161a', fontSize: '0.95rem' }}>Stage 6 — Interactive Manual Correction</div>
+              <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                <strong>Plain English:</strong> Drag and drop pieces on the board, rotate them if they're upside down, and hit undo if you make a mistake.<br />
+                <strong>Technical Details:</strong> Canvas drag-and-drop state manager supporting 90°/180°/270° orientation transforms, coordinate locking, and an immutable action undo/redo stack.
+              </div>
+            </div>
           </li>
+
+          {/* Stage 7 */}
           <li>
             <span className="bullet-queue"></span> 
-            <span><strong>Stage 7 — Persistence & Export Engine:</strong> High-res reconstruction export, Numbered Piece Map PNG, CSV placement table.</span>
+            <div>
+              <div style={{ fontWeight: 700, color: '#14161a', fontSize: '0.95rem' }}>Stage 7 — Persistence & Export Engine</div>
+              <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                <strong>Plain English:</strong> Save your completed reconstructed image in full high resolution, or download a numbered guide map.<br />
+                <strong>Technical Details:</strong> Stitching engine generating composite high-res PNGs, numbered placement overlay schematics, and CSV coordinate tables for physical reference.
+              </div>
+            </div>
           </li>
+
+          {/* Stage 8 */}
           <li>
             <span className="bullet-queue"></span> 
-            <span><strong>Stage 8-11 — Advanced Fragmentation:</strong> Vertical strip contour shred detection, cross-cut OCR continuity, and organic jigsaw puzzle contour tabs/blanks.</span>
+            <div>
+              <div style={{ fontWeight: 700, color: '#14161a', fontSize: '0.95rem' }}>Stage 8 — Straight Shredded Paper Documents</div>
+              <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                <strong>Plain English:</strong> Rebuilds documents run through standard strip shredders by lining up vertical strips left to right.<br />
+                <strong>Technical Details:</strong> Vertical strip contour extraction, Hough transform skew correction, ink stroke continuation scoring, and 1D horizontal sequence ordering.
+              </div>
+            </div>
+          </li>
+
+          {/* Stage 9 */}
+          <li>
+            <span className="bullet-queue"></span> 
+            <div>
+              <div style={{ fontWeight: 700, color: '#14161a', fontSize: '0.95rem' }}>Stage 9 — Cross-Cut Shredded Paper</div>
+              <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                <strong>Plain English:</strong> Solves confidential documents cut into tiny confetti rectangles by matching broken letters and text sentences.<br />
+                <strong>Technical Details:</strong> 2D rectangular particle alignment, local OCR (Tesseract) word continuation analysis, and 2D bipartite matching constraints.
+              </div>
+            </div>
+          </li>
+
+          {/* Stage 10 */}
+          <li>
+            <span className="bullet-queue"></span> 
+            <div>
+              <div style={{ fontWeight: 700, color: '#14161a', fontSize: '0.95rem' }}>Stage 10 — Traditional Jigsaw Puzzles</div>
+              <div style={{ fontWeight: 700, color: '#14161a', fontSize: '0.95rem' }}>
+                <strong>Plain English:</strong> Reconstructs regular classic jigsaw puzzles with curved interlocking tabs and holes.<br />
+                <strong>Technical Details:</strong> Non-rectangular contour segmentation, Fourier descriptor curve matching, tab-to-blank geometric interlocking verification, and flat edge border detection.
+              </div>
+            </div>
+          </li>
+
+          {/* Stage 11 */}
+          <li>
+            <span className="bullet-queue"></span> 
+            <div>
+              <div style={{ fontWeight: 700, color: '#14161a', fontSize: '0.95rem' }}>Stage 11 — Irregular & Criss-Cross Shreds</div>
+              <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                <strong>Plain English:</strong> Solves randomly torn or hand-ripped documents with jagged, jagged organic edges.<br />
+                <strong>Technical Details:</strong> Arbitrary polygon boundary extraction, elastic contour deformation matching, and multi-scale curvature scale space (CSS) alignment.
+              </div>
+            </div>
           </li>
         </ul>
       </div>

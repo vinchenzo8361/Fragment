@@ -8,7 +8,8 @@ import {
   Play, 
   Sliders,
   HelpCircle,
-  FileImage
+  FileImage,
+  Scissors
 } from 'lucide-react';
 import { getProject, uploadImage } from '../api';
 
@@ -16,6 +17,7 @@ const Workspace = () => {
   const { id } = useParams<{ id: string }>();
   const [project, setProject] = useState<any>(null);
   const [uploading, setUploading] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const fetchProject = () => {
     if (id) {
@@ -51,6 +53,8 @@ const Workspace = () => {
       </div>
     );
   }
+
+  const activeImage = project.images && project.images.length > 0 ? project.images[selectedImageIndex] || project.images[0] : null;
 
   return (
     <div className="workspace-wrapper">
@@ -101,63 +105,132 @@ const Workspace = () => {
                 disabled={uploading}
               />
               <Upload size={22} color="var(--gold-primary)" style={{ marginBottom: '0.4rem' }} />
-              <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#121316' }}>
-                {uploading ? 'Processing Image...' : 'Click to Upload Source Image'}
+              <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#111215' }}>
+                {uploading ? 'Processing Image...' : 'Click or Drop Image'}
               </div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-                Supports PNG, JPG or WEBP
+                Supports PNG, JPG, or WEBP
               </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {project.images && project.images.length > 0 ? (
-                project.images.map((img: any) => (
-                  <div key={img.id} className="image-record-item">
-                    <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '190px' }}>
-                      <div style={{ fontWeight: 600, color: '#121316' }}>{img.filename}</div>
-                      <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
-                        {img.width && img.height ? `${img.width}×${img.height} px` : 'Loaded'} • {img.id}
+                project.images.map((img: any, idx: number) => (
+                  <div 
+                    key={img.id} 
+                    className="image-record-item"
+                    onClick={() => setSelectedImageIndex(idx)}
+                    style={{ 
+                      cursor: 'pointer',
+                      borderColor: selectedImageIndex === idx ? 'var(--gold-primary)' : 'var(--border-light)',
+                      backgroundColor: selectedImageIndex === idx ? 'var(--gold-subtle-bg)' : '#ffffff'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                      {img.original_path && img.original_path.startsWith('data:') ? (
+                        <img 
+                          src={img.original_path} 
+                          alt="Thumbnail" 
+                          style={{ width: 34, height: 34, objectFit: 'cover', borderRadius: 4, border: '1px solid var(--border-light)' }} 
+                        />
+                      ) : (
+                        <FileImage size={20} color="var(--gold-primary)" />
+                      )}
+                      <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '170px' }}>
+                        <div style={{ fontWeight: 600, color: '#111215', fontSize: '0.825rem' }}>{img.filename}</div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
+                          {img.width && img.height ? `${img.width}×${img.height} px` : 'Loaded'}
+                        </div>
                       </div>
                     </div>
-                    <FileImage size={18} color="var(--gold-primary)" />
                   </div>
                 ))
               ) : (
                 <div style={{ textAlign: 'center', padding: '1.25rem 0', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                  No source image yet. Upload one above.
+                  No source images yet. Upload an image above!
                 </div>
               )}
             </div>
           </div>
         </aside>
 
-        {/* Center: Canvas Viewport */}
+        {/* Center: Live Interactive Canvas Viewport */}
         <main className="canvas-container">
-          <div className="canvas-placeholder-box">
-            <Grid size={36} color="var(--gold-primary)" style={{ margin: '0 auto 0.75rem' }} />
-            <h3 style={{ fontWeight: 700, fontSize: '1.05rem', marginBottom: '0.35rem', color: '#121316' }}>
-              Reconstruction Canvas
-            </h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-              {project.images && project.images.length > 0
-                ? 'Source media loaded. Click "Split Image into Tiles" in Stage 2 to begin.'
-                : 'Upload a puzzle or document image on the left to start.'}
-            </p>
-          </div>
+          {activeImage ? (
+            <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', maxWidth: '90%', maxHeight: '90%' }}>
+              <div style={{ 
+                background: '#ffffff', 
+                padding: '0.75rem', 
+                borderRadius: 8, 
+                border: '1px solid var(--border-light)', 
+                boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+                maxWidth: '100%',
+                maxHeight: '70vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden'
+              }}>
+                <img 
+                  src={activeImage.original_path.startsWith('data:') ? activeImage.original_path : `http://localhost:8000/${activeImage.original_path}`} 
+                  alt={activeImage.filename}
+                  style={{ maxWidth: '100%', maxHeight: '65vh', objectFit: 'contain', borderRadius: 4 }}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111215' }}>
+                  {activeImage.filename} ({activeImage.width || 800}×{activeImage.height || 800} px)
+                </span>
+                <span className="card-micro-tag">
+                  {project.grid_rows || 4}×{project.grid_cols || 4} Partition Ready
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="canvas-placeholder-box">
+              <Grid size={40} color="var(--gold-primary)" style={{ margin: '0 auto 0.75rem' }} />
+              <h3 style={{ fontWeight: 800, fontSize: '1.1rem', marginBottom: '0.4rem', color: '#111215' }}>
+                Reconstruction Canvas
+              </h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+                Upload any picture or shredded fragment using the left panel. Your image will render live here in high resolution!
+              </p>
+            </div>
+          )}
         </main>
 
-        {/* Right: Piece Details */}
+        {/* Right: Piece & Partition Inspector */}
         <aside className="sidebar-panel-right">
           <div className="panel-titlebar">
-            <span>2. Fragment Inspector</span>
+            <span>2. Partition Inspector</span>
             <HelpCircle size={15} color="var(--text-secondary)" />
           </div>
 
           <div className="panel-scrollable">
-            <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-secondary)', fontSize: '0.825rem', lineHeight: 1.55 }}>
-              <Layers size={32} color="var(--gold-primary)" style={{ margin: '0 auto 0.75rem', opacity: 0.4 }} />
-              Click any piece from the inventory or canvas to inspect edge gradients, coordinates, and neighbor match confidence.
-            </div>
+            {activeImage ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <div style={{ background: 'var(--bg-offwhite)', padding: '1rem', borderRadius: 8, border: '1px solid var(--border-light)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--gold-primary)', fontWeight: 700, fontSize: '0.85rem' }}>
+                    <Scissors size={16} />
+                    <span>Grid Configuration</span>
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    Target Grid: <strong>{project.grid_rows || 4} Rows × {project.grid_cols || 4} Cols</strong><br/>
+                    Total Tiles: <strong>{(project.grid_rows || 4) * (project.grid_cols || 4)} Pieces</strong>
+                  </div>
+                </div>
+
+                <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.5 }}>
+                  <Layers size={28} color="var(--gold-primary)" style={{ margin: '0 auto 0.5rem', opacity: 0.6 }} />
+                  Source image is loaded and ready. In Stage 2, clicking <strong>Split Image</strong> will crop individual tile pieces with permanent IDs!
+                </div>
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-secondary)', fontSize: '0.825rem', lineHeight: 1.55 }}>
+                <Layers size={32} color="var(--gold-primary)" style={{ margin: '0 auto 0.75rem', opacity: 0.4 }} />
+                Upload a source image on the left to inspect grid partitions and piece metadata.
+              </div>
+            )}
           </div>
         </aside>
       </div>
