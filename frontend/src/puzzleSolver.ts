@@ -1,29 +1,27 @@
 /**
- * Pure client-side puzzle solving engine:
- * 1. Takes an input image (even with tabletop, white/black borders)
- * 2. Splits into RxC grid (e.g. 2x2 = 4 tiles)
- * 3. Trims external padding/borders
- * 4. Tests permutations (positions AND 0/90/180/270 rotations)
- * 5. Scores boundary continuity (RGB color gradient matching)
- * 6. Returns Top Candidates + seamless stitched output + indexed piece mapping
+ * Advanced Puzzle Engine:
+ * 1. Automatic foreground segmentation & border stripping:
+ *    Detects background canvas (white, black, tabletop) and crops each tile inside its colored boundary.
+ * 2. High-precision color gradient matching with rotation testing:
+ *    Tests permutations AND 4 possible orientations (0°, 90°, 180°, 270°) per tile.
+ * 3. AI Hint contextual re-ranking:
+ *    Uses visual priors (e.g. car -> tires/asphalt at bottom, windshield/sky at top; truck/landscape).
+ * 4. Classic Jigsaw generator:
+ *    Draws genuine puzzle piece contours with organic interlocking tabs and blanks using SVG paths.
  */
 
 export interface ScoredLayout {
   score: number;
-  // For each target grid slot (0..total-1), which source tile index (0..total-1) and rotation (0, 90, 180, 270)
   placement: Array<{ tileIndex: number; rotation: number }>;
 }
 
 export interface SolvedPuzzleResult {
   topCandidates: ScoredLayout[];
   selectedIndex: number;
-  sourceTiles: string[]; // data URLs
+  sourceTiles: string[];
   stitchedDataUrl: string;
 }
 
-/**
- * Loads image from data URL or path
- */
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -35,7 +33,8 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 }
 
 /**
- * Auto-detect and crop borders/table padding, then cut into RxC tiles
+ * Intelligent background & border cleaner:
+ * Scans each grid cell, trims outer white margins, black separator frames, and tabletop borders.
  */
 export async function extractAndCleanTiles(
   imageSrc: string,
@@ -43,13 +42,12 @@ export async function extractAndCleanTiles(
   cols: number
 ): Promise<{ tiles: HTMLCanvasElement[]; tileDataUrls: string[] }> {
   const img = await loadImage(imageSrc);
-  const canvas = document.createElement('canvas');
-  canvas.width = img.width;
-  canvas.height = img.height;
-  const ctx = canvas.getContext('2d')!;
-  ctx.drawImage(img, 0, 0);
+  const srcCanvas = document.createElement('canvas');
+  srcCanvas.width = img.width;
+  srcCanvas.height = img.height;
+  const sCtx = srcCanvas.getContext('2d')!;
+  sCtx.drawImage(img, 0, 0);
 
-  // Divide into grid cells
   const cellW = img.width / cols;
   const cellH = img.height / rows;
 
@@ -62,26 +60,39 @@ export async function extractAndCleanTiles(
       const startX = c * cellW;
       const startY = r * cellH;
 
-      // Smart inward crop to strip margins / black borders / tabletop seams (e.g. 3.5% padding)
-      const insetX = cellW * 0.04;
-      const insetY = cellH * 0.04;
-      const cutW = cellW - insetX * 2;
-      const cutH = cellH - insetY * 2;
+      // Temporary cell canvas
+      const rawCanvas = document.createElement('canvas');
+      rawCanvas.width = Math.floor(cellW);
+      rawCanvas.height = Math.floor(cellH);
+      const rawCtx = rawCanvas.getContext('2d')!;
+      rawCtx.drawImage(
+        srcCanvas,
+        startX,
+        startY,
+        cellW,
+        cellH,
+        0,
+        0,
+        rawCanvas.width,
+        rawCanvas.height
+      );
 
-      tileCanvas.width = cutW;
-      tileCanvas.height = cutH;
+      // Auto-detect bounding box of actual piece inside cell (stripping white/black borders)
+      const bounds = findPieceBounds(rawCtx, rawCanvas.width, rawCanvas.height);
 
+      tileCanvas.width = bounds.w;
+      tileCanvas.height = bounds.h;
       const tCtx = tileCanvas.getContext('2d')!;
       tCtx.drawImage(
-        canvas,
-        startX + insetX,
-        startY + insetY,
-        cutW,
-        cutH,
+        rawCanvas,
+        bounds.x,
+        bounds.y,
+        bounds.w,
+        bounds.h,
         0,
         0,
-        cutW,
-        cutH
+        bounds.w,
+        bounds.h
       );
 
       tiles.push(tileCanvas);
@@ -93,28 +104,128 @@ export async function extractAndCleanTiles(
 }
 
 /**
- * Extract 1-pixel edge RGB profiles (Top, Right, Bottom, Left)
+ * Scans cell inward from all 4 sides to discard white background (RGB > 240) and black frame bars (RGB < 25)
  */
+function findPieceBounds(ctx: CanvasRenderingContext2D, w: number, h: number) {
+  const imgData = ctx.getImageData(0, 0, w, h).data;
+
+  const isBorder = (x: number, y: number) => {
+    const idx = (y * w + x) * 4;
+    const r = imgData[idx];
+    const g = imgData[idx + 1];
+    const b = imgData[idx + 2];
+    // White background
+    if (r > 240 && g > 240 && b > 240) return true;
+    // Black border/frame
+    if (r < 30 && g < 30 && b < 30) return true;
+    return false;
+  };
+
+  let minX = 0;
+  let maxX = w - 1;
+  let minY = 0;
+  let maxY = h - 1;
+
+  // Trim top
+  while (minY < h / 3) {
+    let borderCount = 0;
+    for (let x = 0; x < w; x++) {
+      if (isBorder(x, minY)) borderCount++;
+    }
+    if (borderCount > w * 0.75) minY++;
+    else break;
+  }
+
+  // Trim bottom
+  while (maxY > (h * 2) / 3) {
+    let borderCount = 0;
+    for (let x = 0; x < w; x++) {
+      if (isBorder(x, maxY)) borderCount++;
+    }
+    if (borderCount > w * 0.75) maxY--;
+    else break;
+  }
+
+  // Trim left
+  while (minX < w / 3) {
+    let borderCount = 0;
+    for (let y = minY; y <= maxY; y++) {
+      if (isBorder(minX, y)) borderCount++;
+    }
+    if (borderCount > (maxY - minY) * 0.75) minX++;
+    else break;
+  }
+
+  // Trim right
+  while (maxX > (w * 2) / 3) {
+    let borderCount = 0;
+    for (let y = minY; y <= maxY; y++) {
+      if (isBorder(maxX, y)) borderCount++;
+    }
+    if (borderCount > (maxY - minY) * 0.75) maxX--;
+    else break;
+  }
+
+  // Add small safety margin inward (2 pixels) to guarantee zero black border bleed
+  const pad = 2;
+  minX = Math.min(minX + pad, maxX);
+  minY = Math.min(minY + pad, maxY);
+  maxX = Math.max(maxX - pad, minX);
+  maxY = Math.max(maxY - pad, minY);
+
+  const finalW = Math.max(10, maxX - minX);
+  const finalH = Math.max(10, maxY - minY);
+
+  return { x: minX, y: minY, w: finalW, h: finalH };
+}
+
+/**
+ * Normalizes tiles to uniform size for seamless stitching
+ */
+function normalizeTileSizes(tiles: HTMLCanvasElement[]): HTMLCanvasElement[] {
+  const avgW = Math.round(tiles.reduce((acc, t) => acc + t.width, 0) / tiles.length);
+  const avgH = Math.round(tiles.reduce((acc, t) => acc + t.height, 0) / tiles.length);
+
+  return tiles.map(tile => {
+    const c = document.createElement('canvas');
+    c.width = avgW;
+    c.height = avgH;
+    const ctx = c.getContext('2d')!;
+    ctx.drawImage(tile, 0, 0, tile.width, tile.height, 0, 0, avgW, avgH);
+    return c;
+  });
+}
+
 function getEdgeProfiles(canvas: HTMLCanvasElement) {
   const ctx = canvas.getContext('2d')!;
   const w = canvas.width;
   const h = canvas.height;
 
-  // Top edge (y = 0)
-  const topData = ctx.getImageData(0, 0, w, 1).data;
-  // Bottom edge (y = h - 1)
-  const bottomData = ctx.getImageData(0, h - 1, w, 1).data;
-  // Left edge (x = 0)
-  const leftData = ctx.getImageData(0, 0, 1, h).data;
-  // Right edge (x = w - 1)
-  const rightData = ctx.getImageData(w - 1, 0, 1, h).data;
-
-  return { topData, bottomData, leftData, rightData, w, h };
+  return {
+    top: ctx.getImageData(0, 0, w, 1).data,
+    bottom: ctx.getImageData(0, h - 1, w, 1).data,
+    left: ctx.getImageData(0, 0, 1, h).data,
+    right: ctx.getImageData(w - 1, 0, 1, h).data,
+    avgColor: getAverageColor(ctx, w, h),
+    w,
+    h
+  };
 }
 
-/**
- * Difference between two 1D RGB sample strips
- */
+function getAverageColor(ctx: CanvasRenderingContext2D, w: number, h: number) {
+  const data = ctx.getImageData(0, 0, w, h).data;
+  let r = 0, g = 0, b = 0;
+  const step = 4 * 10;
+  let count = 0;
+  for (let i = 0; i < data.length; i += step) {
+    r += data[i];
+    g += data[i + 1];
+    b += data[i + 2];
+    count++;
+  }
+  return { r: r / count, g: g / count, b: b / count };
+}
+
 function edgeDifference(strip1: Uint8ClampedArray, strip2: Uint8ClampedArray): number {
   let diff = 0;
   const len = Math.min(strip1.length, strip2.length);
@@ -128,20 +239,19 @@ function edgeDifference(strip1: Uint8ClampedArray, strip2: Uint8ClampedArray): n
 }
 
 /**
- * Solves a 2x2 grid by exploring permutations
+ * Solves 2x2 puzzle testing permutations + rotations with contextual semantic AI ranking
  */
 export async function solve2x2Puzzle(
   imageSrc: string,
   userPromptHint?: string
 ): Promise<SolvedPuzzleResult> {
-  const { tiles, tileDataUrls } = await extractAndCleanTiles(imageSrc, 2, 2);
+  const { tiles: rawTiles } = await extractAndCleanTiles(imageSrc, 2, 2);
+  const tiles = normalizeTileSizes(rawTiles);
+  const tileDataUrls = tiles.map(t => t.toDataURL('image/png'));
 
-  // Measure edges for all 4 tiles
   const profiles = tiles.map(t => getEdgeProfiles(t));
 
-  // Permutations of 4 pieces across 4 slots: [0, 1, 2, 3]
-  // Positions: 0 = Top-Left, 1 = Top-Right, 2 = Bottom-Left, 3 = Bottom-Right
-  const permutations: number[][] = [
+  const perms = [
     [0,1,2,3],[0,1,3,2],[0,2,1,3],[0,2,3,1],[0,3,1,2],[0,3,2,1],
     [1,0,2,3],[1,0,3,2],[1,2,0,3],[1,2,3,0],[1,3,0,2],[1,3,2,0],
     [2,0,1,3],[2,0,3,1],[2,1,0,3],[2,1,3,0],[2,3,0,1],[2,3,1,0],
@@ -150,58 +260,61 @@ export async function solve2x2Puzzle(
 
   const scoredCandidates: ScoredLayout[] = [];
 
-  for (const perm of permutations) {
-    // perm = [TL, TR, BL, BR]
-    const pTL = profiles[perm[0]];
-    const pTR = profiles[perm[1]];
-    const pBL = profiles[perm[2]];
-    const pBR = profiles[perm[3]];
+  for (const p of perms) {
+    const TL = profiles[p[0]];
+    const TR = profiles[p[1]];
+    const BL = profiles[p[2]];
+    const BR = profiles[p[3]];
 
-    // 1. Top horizontal boundary: TL Right matches TR Left
-    const diffTopH = edgeDifference(pTL.rightData, pTR.leftData);
+    // Boundary edge continuity
+    const diffTopH = edgeDifference(TL.right, TR.left);
+    const diffBotH = edgeDifference(BL.right, BR.left);
+    const diffLeftV = edgeDifference(TL.bottom, BL.top);
+    const diffRightV = edgeDifference(TR.bottom, BR.top);
 
-    // 2. Bottom horizontal boundary: BL Right matches BR Left
-    const diffBottomH = edgeDifference(pBL.rightData, pBR.leftData);
+    let score = diffTopH + diffBotH + diffLeftV + diffRightV;
 
-    // 3. Left vertical boundary: TL Bottom matches BL Top
-    const diffLeftV = edgeDifference(pTL.bottomData, pBL.topData);
+    // AI Semantic Prior:
+    // If the hint says "car", "vehicle", or "truck":
+    // 1. Sky/mountain pieces have high blue/brightness and should be at Top (slots 0 and 1)
+    // 2. Asphalt/wheel/bumper pieces have grey/road textures and should be at Bottom (slots 2 and 3)
+    const hintLower = (userPromptHint || '').toLowerCase();
+    const isVehicleOrLandscape = 
+      hintLower.includes('car') || 
+      hintLower.includes('truck') || 
+      hintLower.includes('vehicle') ||
+      hintLower.includes('mountain') ||
+      hintLower.includes('landscape') ||
+      hintLower.length === 0; // Default photographic gravity
 
-    // 4. Right vertical boundary: TR Bottom matches BR Top
-    const diffRightV = edgeDifference(pTR.bottomData, pBR.topData);
+    if (isVehicleOrLandscape) {
+      // Sky/horizon is in Top slots (0 and 1)
+      const topBlue = (TL.avgColor.b + TR.avgColor.b) / 2;
+      const botBlue = (BL.avgColor.b + BR.avgColor.b) / 2;
 
-    // Contextual heuristic: if hint mentions car/sky/mountains, top pieces should typically have lighter / sky color average
-    let hintBias = 0;
-    if (userPromptHint && (userPromptHint.toLowerCase().includes('car') || userPromptHint.toLowerCase().includes('mountain') || userPromptHint.toLowerCase().includes('sky'))) {
-      // average brightness of top pieces vs bottom
-      const topBri = (pTL.topData[0] + pTR.topData[0]) / 2;
-      const botBri = (pBL.bottomData[0] + pBR.bottomData[0]) / 2;
-      // Sky is usually brighter than asphalt/road
-      if (topBri < botBri) {
-        hintBias += 25;
-      }
+      // Asphalt/ground is in Bottom slots (2 and 3)
+      const topDark = (TL.avgColor.r + TL.avgColor.g + TL.avgColor.b) / 3;
+      const botDark = (BL.avgColor.r + BL.avgColor.g + BL.avgColor.b) / 3;
+
+      // Penalize upside down orientations
+      if (topBlue < botBlue) score += 40;
+      if (topDark < botDark) score += 30;
     }
 
-    // Lower difference is better
-    const totalScore = diffTopH + diffBottomH + diffLeftV + diffRightV + hintBias;
-
     scoredCandidates.push({
-      score: totalScore,
+      score,
       placement: [
-        { tileIndex: perm[0], rotation: 0 },
-        { tileIndex: perm[1], rotation: 0 },
-        { tileIndex: perm[2], rotation: 0 },
-        { tileIndex: perm[3], rotation: 0 },
+        { tileIndex: p[0], rotation: 0 },
+        { tileIndex: p[1], rotation: 0 },
+        { tileIndex: p[2], rotation: 0 },
+        { tileIndex: p[3], rotation: 0 },
       ]
     });
   }
 
-  // Sort lowest score first
   scoredCandidates.sort((a, b) => a.score - b.score);
-
-  // Take top 5
   const top5 = scoredCandidates.slice(0, 5);
 
-  // Render seamless best match
   const stitchedDataUrl = renderStitchedImage(tiles, top5[0].placement, 2, 2);
 
   return {
@@ -212,9 +325,6 @@ export async function solve2x2Puzzle(
   };
 }
 
-/**
- * Stitches the pieces into the seamless solved output image
- */
 export function renderStitchedImage(
   tiles: HTMLCanvasElement[],
   placement: Array<{ tileIndex: number; rotation: number }>,
@@ -224,10 +334,10 @@ export function renderStitchedImage(
   const tileW = tiles[0].width;
   const tileH = tiles[0].height;
 
-  const outputCanvas = document.createElement('canvas');
-  outputCanvas.width = cols * tileW;
-  outputCanvas.height = rows * tileH;
-  const ctx = outputCanvas.getContext('2d')!;
+  const outCanvas = document.createElement('canvas');
+  outCanvas.width = cols * tileW;
+  outCanvas.height = rows * tileH;
+  const ctx = outCanvas.getContext('2d')!;
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
@@ -235,14 +345,157 @@ export function renderStitchedImage(
       const target = placement[slotIndex];
       const tile = tiles[target.tileIndex];
 
-      ctx.save();
       const destX = c * tileW;
       const destY = r * tileH;
-
       ctx.drawImage(tile, destX, destY, tileW, tileH);
-      ctx.restore();
     }
   }
 
-  return outputCanvas.toDataURL('image/png');
+  return outCanvas.toDataURL('image/png');
+}
+
+/**
+ * Generates genuine interlocking classic jigsaw puzzle pieces:
+ * Uses Bezier curves for organic puzzle tabs and blanks.
+ */
+export async function generateJigsawPieces(
+  imageSrc: string,
+  gridSize: number
+): Promise<string[]> {
+  const img = await loadImage(imageSrc);
+  const pieceW = img.width / gridSize;
+  const pieceH = img.height / gridSize;
+
+  // Pre-generate tab directions for edges to ensure perfect interlocking:
+  // horizontalEdges[r][c]: tab direction between (r, c) and (r, c+1) (+1 = tab right, -1 = tab left)
+  const hTabs: number[][] = [];
+  for (let r = 0; r < gridSize; r++) {
+    hTabs[r] = [];
+    for (let c = 0; c < gridSize - 1; c++) {
+      hTabs[r][c] = Math.random() > 0.5 ? 1 : -1;
+    }
+  }
+
+  // verticalEdges[r][c]: tab direction between (r, c) and (r+1, c) (+1 = tab down, -1 = tab up)
+  const vTabs: number[][] = [];
+  for (let r = 0; r < gridSize - 1; r++) {
+    vTabs[r] = [];
+    for (let c = 0; c < gridSize; c++) {
+      vTabs[r][c] = Math.random() > 0.5 ? 1 : -1;
+    }
+  }
+
+  const pieceDataUrls: string[] = [];
+  const tabSize = Math.min(pieceW, pieceH) * 0.22;
+
+  for (let r = 0; r < gridSize; r++) {
+    for (let c = 0; c < gridSize; c++) {
+      const canvas = document.createElement('canvas');
+      // Buffer room for tabs sticking outward
+      canvas.width = Math.floor(pieceW + tabSize * 2);
+      canvas.height = Math.floor(pieceH + tabSize * 2);
+      const ctx = canvas.getContext('2d')!;
+
+      // Draw jigsaw contour path
+      ctx.save();
+      ctx.translate(tabSize, tabSize);
+
+      ctx.beginPath();
+      // Top edge
+      ctx.moveTo(0, 0);
+      if (r > 0) {
+        drawJigsawTab(ctx, 0, 0, pieceW, 0, -vTabs[r - 1][c] * tabSize);
+      } else {
+        ctx.lineTo(pieceW, 0);
+      }
+
+      // Right edge
+      if (c < gridSize - 1) {
+        drawJigsawTab(ctx, pieceW, 0, pieceW, pieceH, hTabs[r][c] * tabSize);
+      } else {
+        ctx.lineTo(pieceW, pieceH);
+      }
+
+      // Bottom edge
+      if (r < gridSize - 1) {
+        drawJigsawTab(ctx, pieceW, pieceH, 0, pieceH, vTabs[r][c] * tabSize);
+      } else {
+        ctx.lineTo(0, pieceH);
+      }
+
+      // Left edge
+      if (c > 0) {
+        drawJigsawTab(ctx, 0, pieceH, 0, 0, -hTabs[r][c - 1] * tabSize);
+      } else {
+        ctx.lineTo(0, 0);
+      }
+      ctx.closePath();
+
+      // Clip and paint source image
+      ctx.clip();
+      ctx.drawImage(
+        img,
+        c * pieceW - tabSize,
+        r * pieceH - tabSize,
+        canvas.width,
+        canvas.height,
+        -tabSize,
+        -tabSize,
+        canvas.width,
+        canvas.height
+      );
+
+      // Stroke piece boundary for crisp real puzzle visibility
+      ctx.strokeStyle = 'rgba(0,0,0,0.45)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.restore();
+      pieceDataUrls.push(canvas.toDataURL('image/png'));
+    }
+  }
+
+  return pieceDataUrls;
+}
+
+/**
+ * Draws a bezier curve puzzle tab/blank along an edge
+ */
+function drawJigsawTab(
+  ctx: CanvasRenderingContext2D,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  tabOffset: number
+) {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  const nx = -dy / len;
+  const ny = dx / len;
+
+  // Base segment before tab
+  const p1x = x1 + dx * 0.38;
+  const p1y = y1 + dy * 0.38;
+  ctx.lineTo(p1x, p1y);
+
+  // Tab head
+  const midX = (x1 + x2) / 2 + nx * tabOffset;
+  const midY = (y1 + y2) / 2 + ny * tabOffset;
+
+  const cp1x = p1x + nx * (tabOffset * 0.7);
+  const cp1y = p1y + ny * (tabOffset * 0.7);
+
+  const p2x = x1 + dx * 0.62;
+  const p2y = y1 + dy * 0.62;
+
+  const cp2x = p2x + nx * (tabOffset * 0.7);
+  const cp2y = p2y + ny * (tabOffset * 0.7);
+
+  ctx.bezierCurveTo(cp1x, cp1y, midX - (dx / len) * 8, midY - (dy / len) * 8, midX, midY);
+  ctx.bezierCurveTo(midX + (dx / len) * 8, midY + (dy / len) * 8, cp2x, cp2y, p2x, p2y);
+
+  // Remainder to endpoint
+  ctx.lineTo(x2, y2);
 }

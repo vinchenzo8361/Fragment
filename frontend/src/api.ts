@@ -29,10 +29,8 @@ function saveLocalProjects(projects: any[]) {
 export const getProjects = async () => {
   try {
     const res = await api.get('/projects/');
-    // If backend succeeds, merge / update local cache
     return res;
   } catch {
-    // Graceful offline fallback: load from browser storage so Vercel test works smoothly
     const local = getLocalProjects();
     return { data: local };
   }
@@ -48,7 +46,6 @@ export const getProject = async (id: string) => {
     if (found) {
       return { data: found };
     }
-    // Return sample empty project if not found
     return {
       data: {
         id,
@@ -56,8 +53,8 @@ export const getProject = async (id: string) => {
         puzzle_type: 'square-tile',
         created_at: new Date().toISOString(),
         images: [],
-        grid_rows: 4,
-        grid_cols: 4,
+        grid_rows: 2,
+        grid_cols: 2,
       }
     };
   }
@@ -66,13 +63,11 @@ export const getProject = async (id: string) => {
 export const createProject = async (data: any) => {
   try {
     const res = await api.post('/projects/', data);
-    // Also mirror to local storage
     const local = getLocalProjects();
     local.unshift(res.data);
     saveLocalProjects(local);
     return res;
   } catch {
-    // If local backend is not reachable (e.g. testing directly on Vercel without local server):
     const newId = `PROJ-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
     const newProject = {
       id: newId,
@@ -80,8 +75,8 @@ export const createProject = async (data: any) => {
       puzzle_type: data.puzzle_type || 'square-tile',
       created_at: new Date().toISOString(),
       images: [],
-      grid_rows: data.grid_rows || 4,
-      grid_cols: data.grid_cols || 4,
+      grid_rows: data.grid_rows || 2,
+      grid_cols: data.grid_cols || 2,
       status: 'created',
     };
     const local = getLocalProjects();
@@ -89,6 +84,17 @@ export const createProject = async (data: any) => {
     saveLocalProjects(local);
     return { data: newProject };
   }
+};
+
+export const deleteProject = async (id: string) => {
+  try {
+    await api.delete(`/projects/${id}`);
+  } catch {
+    // Ignore error if backend offline
+  }
+  const local = getLocalProjects().filter((p: any) => p.id !== id);
+  saveLocalProjects(local);
+  return { success: true };
 };
 
 export const uploadImage = async (id: string, file: File) => {
@@ -99,7 +105,6 @@ export const uploadImage = async (id: string, file: File) => {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   } catch {
-    // Offline simulation: read file as data URL and store in local project state
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = () => {
@@ -123,6 +128,21 @@ export const uploadImage = async (id: string, file: File) => {
       reader.readAsDataURL(file);
     });
   }
+};
+
+export const deleteImage = async (projectId: string, imageId: string) => {
+  try {
+    await api.delete(`/projects/${projectId}/images/${imageId}`);
+  } catch {
+    // Ignore error if backend offline
+  }
+  const local = getLocalProjects();
+  const proj = local.find((p: any) => p.id === projectId);
+  if (proj && proj.images) {
+    proj.images = proj.images.filter((img: any) => img.id !== imageId);
+    saveLocalProjects(local);
+  }
+  return { success: true };
 };
 
 export default api;
