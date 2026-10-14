@@ -6,18 +6,38 @@ import {
   Layers, 
   Grid, 
   Play, 
-  Sliders,
-  HelpCircle,
-  FileImage,
-  Scissors
+  HelpCircle, 
+  FileImage, 
+  Sparkles,
+  Eye,
+  SlidersHorizontal,
+  CheckCircle2,
+  Wand2
 } from 'lucide-react';
 import { getProject, uploadImage } from '../api';
+import { solve2x2Puzzle, extractAndCleanTiles } from '../puzzleSolver';
+import type { SolvedPuzzleResult } from '../puzzleSolver';
 
 const Workspace = () => {
   const { id } = useParams<{ id: string }>();
   const [project, setProject] = useState<any>(null);
   const [uploading, setUploading] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  // AI Hint / Guidance
+  const [aiPromptHint, setAiPromptHint] = useState('');
+
+  // Puzzle Solver state
+  const [solving, setSolving] = useState(false);
+  const [solveResult, setSolveResult] = useState<SolvedPuzzleResult | null>(null);
+  const [activeCandidateIdx, setActiveCandidateIdx] = useState(0);
+  const [showWhereItGoes, setShowWhereItGoes] = useState(false);
+
+  // Puzzle Creator state
+  const [creatorGridSize, setCreatorGridSize] = useState(4); // 2 to 20
+  const [creatorStyle, setCreatorStyle] = useState<'tiles' | 'jigsaw'>('tiles');
+  const [createdTiles, setCreatedTiles] = useState<string[]>([]);
+  const [generatingCreator, setGeneratingCreator] = useState(false);
 
   const fetchProject = () => {
     if (id) {
@@ -34,6 +54,8 @@ const Workspace = () => {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0] && id) {
       setUploading(true);
+      // Reset solve result for new image
+      setSolveResult(null);
       try {
         await uploadImage(id, e.target.files[0]);
         fetchProject();
@@ -46,6 +68,48 @@ const Workspace = () => {
     }
   };
 
+  const activeImage = project?.images && project.images.length > 0 
+    ? project.images[selectedImageIndex] || project.images[0] 
+    : null;
+
+  // Run Solver
+  const handleSolve = async () => {
+    if (!activeImage) return;
+    setSolving(true);
+    try {
+      const imgSrc = activeImage.original_path.startsWith('data:') 
+        ? activeImage.original_path 
+        : `http://localhost:8000/${activeImage.original_path}`;
+
+      const res = await solve2x2Puzzle(imgSrc, aiPromptHint);
+      setSolveResult(res);
+      setActiveCandidateIdx(0);
+    } catch (err) {
+      console.error(err);
+      alert('Error during solving. Make sure the uploaded image is valid.');
+    } finally {
+      setSolving(false);
+    }
+  };
+
+  // Run Puzzle Creator
+  const handleGenerateCreatorTiles = async () => {
+    if (!activeImage) return;
+    setGeneratingCreator(true);
+    try {
+      const imgSrc = activeImage.original_path.startsWith('data:') 
+        ? activeImage.original_path 
+        : `http://localhost:8000/${activeImage.original_path}`;
+
+      const { tileDataUrls } = await extractAndCleanTiles(imgSrc, creatorGridSize, creatorGridSize);
+      setCreatedTiles(tileDataUrls);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setGeneratingCreator(false);
+    }
+  };
+
   if (!project) {
     return (
       <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
@@ -54,7 +118,7 @@ const Workspace = () => {
     );
   }
 
-  const activeImage = project.images && project.images.length > 0 ? project.images[selectedImageIndex] || project.images[0] : null;
+  const isCreatorMode = project.puzzle_type === 'puzzle-creator';
 
   return (
     <div className="workspace-wrapper">
@@ -74,20 +138,33 @@ const Workspace = () => {
         </div>
 
         <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
-          <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>
-            <Sliders size={14} color="var(--text-primary)" />
-            <span>Options</span>
-          </button>
-          <button className="btn btn-primary" style={{ padding: '0.4rem 0.95rem', fontSize: '0.8rem' }}>
-            <Play size={14} fill="#fff" color="#fff" />
-            <span>Run Reconstruction</span>
-          </button>
+          {isCreatorMode ? (
+            <button 
+              onClick={handleGenerateCreatorTiles} 
+              disabled={!activeImage || generatingCreator}
+              className="btn btn-primary" 
+              style={{ padding: '0.45rem 1.1rem', fontSize: '0.85rem' }}
+            >
+              <Wand2 size={15} />
+              <span>{generatingCreator ? 'Generating Tiles...' : `Generate ${creatorGridSize}×${creatorGridSize} Puzzle`}</span>
+            </button>
+          ) : (
+            <button 
+              onClick={handleSolve} 
+              disabled={!activeImage || solving}
+              className="btn btn-primary" 
+              style={{ padding: '0.45rem 1.1rem', fontSize: '0.85rem' }}
+            >
+              <Play size={15} fill="#fff" color="#fff" />
+              <span>{solving ? 'Analyzing Permutations...' : 'Solve & Reconstruct'}</span>
+            </button>
+          )}
         </div>
       </div>
 
       {/* 3-Panel IDE Workbench */}
       <div className="workspace-grid-layout">
-        {/* Left: Input Assets */}
+        {/* Left: Input Assets & AI Hint */}
         <aside className="sidebar-panel">
           <div className="panel-titlebar">
             <span>1. Source Media</span>
@@ -97,6 +174,7 @@ const Workspace = () => {
           </div>
 
           <div className="panel-scrollable">
+            {/* Upload Box */}
             <div className="upload-zone">
               <input 
                 type="file" 
@@ -113,13 +191,38 @@ const Workspace = () => {
               </div>
             </div>
 
+            {/* AI Nudge Input (for all solver modes) */}
+            {!isCreatorMode && (
+              <div style={{ background: 'var(--bg-offwhite)', padding: '0.85rem', borderRadius: 8, border: '1px solid var(--border-light)' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', fontWeight: 700, color: '#111215', marginBottom: '0.35rem' }}>
+                  <Sparkles size={14} color="var(--gold-primary)" />
+                  <span>AI Hint (Optional): What is this image?</span>
+                </label>
+                <input 
+                  type="text" 
+                  value={aiPromptHint} 
+                  onChange={(e) => setAiPromptHint(e.target.value)}
+                  placeholder="e.g. blue car in front of mountains"
+                  className="form-input"
+                  style={{ fontSize: '0.8rem', padding: '0.5rem 0.65rem' }}
+                />
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                  Gives the permutation solver a hint to rank top sky/car borders accurately.
+                </div>
+              </div>
+            )}
+
+            {/* List of images */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {project.images && project.images.length > 0 ? (
                 project.images.map((img: any, idx: number) => (
                   <div 
                     key={img.id} 
                     className="image-record-item"
-                    onClick={() => setSelectedImageIndex(idx)}
+                    onClick={() => {
+                      setSelectedImageIndex(idx);
+                      setSolveResult(null);
+                    }}
                     style={{ 
                       cursor: 'pointer',
                       borderColor: selectedImageIndex === idx ? 'var(--gold-primary)' : 'var(--border-light)',
@@ -154,37 +257,248 @@ const Workspace = () => {
           </div>
         </aside>
 
-        {/* Center: Live Interactive Canvas Viewport */}
+        {/* Center: Live Interactive Canvas */}
         <main className="canvas-container">
           {activeImage ? (
-            <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', maxWidth: '90%', maxHeight: '90%' }}>
-              <div style={{ 
-                background: '#ffffff', 
-                padding: '0.75rem', 
-                borderRadius: 8, 
-                border: '1px solid var(--border-light)', 
-                boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
-                maxWidth: '100%',
-                maxHeight: '70vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden'
-              }}>
-                <img 
-                  src={activeImage.original_path.startsWith('data:') ? activeImage.original_path : `http://localhost:8000/${activeImage.original_path}`} 
-                  alt={activeImage.filename}
-                  style={{ maxWidth: '100%', maxHeight: '65vh', objectFit: 'contain', borderRadius: 4 }}
-                />
-              </div>
-              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111215' }}>
-                  {activeImage.filename} ({activeImage.width || 800}×{activeImage.height || 800} px)
-                </span>
-                <span className="card-micro-tag">
-                  {project.grid_rows || 4}×{project.grid_cols || 4} Partition Ready
-                </span>
-              </div>
+            <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', maxWidth: '95%', maxHeight: '92%' }}>
+              
+              {/* Creator Mode View */}
+              {isCreatorMode ? (
+                createdTiles.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: `repeat(${creatorGridSize}, 1fr)`,
+                      gap: '2px',
+                      background: '#111215',
+                      padding: '4px',
+                      borderRadius: 8,
+                      maxHeight: '65vh',
+                      maxWidth: '65vh',
+                      overflow: 'hidden'
+                    }}>
+                      {createdTiles.map((tile, i) => (
+                        <div key={i} style={{ position: 'relative', overflow: 'hidden', aspectRatio: '1/1' }}>
+                          <img src={tile} alt={`Tile ${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                          <div style={{
+                            position: 'absolute',
+                            top: 3,
+                            left: 3,
+                            background: 'rgba(0,0,0,0.65)',
+                            color: '#fff',
+                            fontSize: '0.65rem',
+                            padding: '1px 4px',
+                            borderRadius: 3,
+                            fontFamily: 'var(--font-mono)'
+                          }}>
+                            {i + 1}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111215' }}>
+                      Generated {creatorGridSize * creatorGridSize} Puzzle Pieces ({creatorGridSize}×{creatorGridSize} Grid)
+                    </span>
+                  </div>
+                ) : (
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ 
+                      background: '#ffffff', 
+                      padding: '0.75rem', 
+                      borderRadius: 8, 
+                      border: '1px solid var(--border-light)', 
+                      boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+                      display: 'inline-block'
+                    }}>
+                      <img 
+                        src={activeImage.original_path.startsWith('data:') ? activeImage.original_path : `http://localhost:8000/${activeImage.original_path}`} 
+                        alt="Source"
+                        style={{ maxHeight: '55vh', maxWidth: '55vh', objectFit: 'contain' }}
+                      />
+                    </div>
+                    <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                      Adjust the slider on the right to choose pieces, then click <strong>Generate Puzzle</strong>.
+                    </div>
+                  </div>
+                )
+              ) : (
+                /* Solver Mode View */
+                solveResult ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', width: '100%' }}>
+                    {/* Controls Bar for Solver */}
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', background: '#ffffff', padding: '0.5rem 1rem', borderRadius: 8, border: '1px solid var(--border-light)', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+                      <button 
+                        onClick={() => setShowWhereItGoes(!showWhereItGoes)}
+                        className={`btn ${showWhereItGoes ? 'btn-primary' : 'btn-secondary'}`}
+                        style={{ padding: '0.4rem 0.85rem', fontSize: '0.8rem' }}
+                      >
+                        <Eye size={14} />
+                        <span>{showWhereItGoes ? 'Hide Numbers' : 'Show Where It Goes (Numbered)'}</span>
+                      </button>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                        <span>Candidate:</span>
+                        {solveResult.topCandidates.map((_, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setActiveCandidateIdx(idx)}
+                            style={{
+                              padding: '0.25rem 0.6rem',
+                              borderRadius: 4,
+                              border: activeCandidateIdx === idx ? '1px solid var(--gold-primary)' : '1px solid var(--border-light)',
+                              background: activeCandidateIdx === idx ? 'var(--gold-subtle-bg)' : '#ffffff',
+                              color: activeCandidateIdx === idx ? 'var(--gold-primary)' : 'var(--text-secondary)',
+                              fontWeight: 700,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            #{idx + 1}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Side-by-Side or Solved View */}
+                    {showWhereItGoes ? (
+                      <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
+                        {/* 1. Input Scrambled with [1][2][3][4] */}
+                        <div style={{ textAlign: 'center' }}>
+                          <div style={{ fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.4rem', color: '#111215' }}>
+                            Scrambled Input (Source)
+                          </div>
+                          <div style={{ 
+                            display: 'grid', 
+                            gridTemplateColumns: 'repeat(2, 1fr)', 
+                            gap: '3px', 
+                            background: '#111215', 
+                            padding: '4px', 
+                            borderRadius: 8,
+                            width: '240px',
+                            height: '240px'
+                          }}>
+                            {solveResult.sourceTiles.map((tile, i) => (
+                              <div key={i} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+                                <img src={tile} alt={`Input Tile ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                <div style={{
+                                  position: 'absolute',
+                                  top: 5,
+                                  left: 5,
+                                  background: '#d4af37',
+                                  color: '#000',
+                                  fontWeight: 800,
+                                  fontSize: '0.85rem',
+                                  width: '24px',
+                                  height: '24px',
+                                  borderRadius: '50%',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  boxShadow: '0 2px 6px rgba(0,0,0,0.5)'
+                                }}>
+                                  {i + 1}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Arrow */}
+                        <div style={{ fontSize: '1.5rem', color: 'var(--gold-primary)', fontWeight: 800 }}>➔</div>
+
+                        {/* 2. Solved Layout with Stamped Numbers */}
+                        <div style={{ textAlign: 'center' }}>
+                          <div style={{ fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.4rem', color: '#111215' }}>
+                            Reconstructed Car (Numbered Placements)
+                          </div>
+                          <div style={{ 
+                            display: 'grid', 
+                            gridTemplateColumns: 'repeat(2, 1fr)', 
+                            gap: '1px', 
+                            background: '#111215', 
+                            padding: '4px', 
+                            borderRadius: 8,
+                            width: '240px',
+                            height: '240px'
+                          }}>
+                            {solveResult.topCandidates[activeCandidateIdx].placement.map((item, slotIdx) => (
+                              <div key={slotIdx} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+                                <img 
+                                  src={solveResult.sourceTiles[item.tileIndex]} 
+                                  alt={`Placed ${item.tileIndex + 1}`} 
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                />
+                                <div style={{
+                                  position: 'absolute',
+                                  top: 5,
+                                  left: 5,
+                                  background: '#10b981',
+                                  color: '#fff',
+                                  fontWeight: 800,
+                                  fontSize: '0.85rem',
+                                  width: '24px',
+                                  height: '24px',
+                                  borderRadius: '50%',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  boxShadow: '0 2px 6px rgba(0,0,0,0.5)'
+                                }}>
+                                  {item.tileIndex + 1}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      /* Pure Clean Reconstructed Image Without Lines */
+                      <div style={{ textAlign: 'center' }}>
+                        <div style={{ 
+                          background: '#ffffff', 
+                          padding: '0.5rem', 
+                          borderRadius: 8, 
+                          border: '1px solid var(--border-light)', 
+                          boxShadow: '0 8px 30px rgba(0,0,0,0.08)',
+                          display: 'inline-block'
+                        }}>
+                          <img 
+                            src={solveResult.stitchedDataUrl} 
+                            alt="Reconstructed Original" 
+                            style={{ maxHeight: '65vh', maxWidth: '65vh', objectFit: 'contain', borderRadius: 4 }}
+                          />
+                        </div>
+                        <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', justifyContent: 'center', alignItems: 'center' }}>
+                          <CheckCircle2 size={16} color="#10b981" />
+                          <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#111215' }}>
+                            Clean Reconstructed Car (Rank #{activeCandidateIdx + 1})
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  /* Initial State with uploaded image */
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ 
+                      background: '#ffffff', 
+                      padding: '0.75rem', 
+                      borderRadius: 8, 
+                      border: '1px solid var(--border-light)', 
+                      boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+                      display: 'inline-block'
+                    }}>
+                      <img 
+                        src={activeImage.original_path.startsWith('data:') ? activeImage.original_path : `http://localhost:8000/${activeImage.original_path}`} 
+                        alt={activeImage.filename}
+                        style={{ maxHeight: '55vh', maxWidth: '55vh', objectFit: 'contain' }}
+                      />
+                    </div>
+                    <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                      Scrambled image uploaded. Click <strong>Solve & Reconstruct</strong> above to solve!
+                    </div>
+                  </div>
+                )
+              )}
             </div>
           ) : (
             <div className="canvas-placeholder-box">
@@ -193,42 +507,110 @@ const Workspace = () => {
                 Reconstruction Canvas
               </h3>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-                Upload any picture or shredded fragment using the left panel. Your image will render live here in high resolution!
+                Upload any picture or scrambled puzzle on the left panel to begin.
               </p>
             </div>
           )}
         </main>
 
-        {/* Right: Piece & Partition Inspector */}
+        {/* Right: Inspector & Mode Controls */}
         <aside className="sidebar-panel-right">
           <div className="panel-titlebar">
-            <span>2. Partition Inspector</span>
+            <span>2. {isCreatorMode ? 'Creator Controls' : 'Solver Inspector'}</span>
             <HelpCircle size={15} color="var(--text-secondary)" />
           </div>
 
           <div className="panel-scrollable">
-            {activeImage ? (
+            {isCreatorMode ? (
+              /* Puzzle Creator Controls */
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                 <div style={{ background: 'var(--bg-offwhite)', padding: '1rem', borderRadius: 8, border: '1px solid var(--border-light)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--gold-primary)', fontWeight: 700, fontSize: '0.85rem' }}>
-                    <Scissors size={16} />
-                    <span>Grid Configuration</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', color: 'var(--gold-primary)', fontWeight: 700, fontSize: '0.85rem' }}>
+                    <SlidersHorizontal size={16} />
+                    <span>Puzzle Density Slider (2 to 20)</span>
                   </div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                    Target Grid: <strong>{project.grid_rows || 4} Rows × {project.grid_cols || 4} Cols</strong><br/>
-                    Total Tiles: <strong>{(project.grid_rows || 4) * (project.grid_cols || 4)} Pieces</strong>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 600, color: '#111215', marginBottom: '0.35rem' }}>
+                    <span>Grid Size: {creatorGridSize}×{creatorGridSize}</span>
+                    <span>{creatorGridSize * creatorGridSize} Total Pieces</span>
+                  </div>
+
+                  <input 
+                    type="range" 
+                    min={2} 
+                    max={20} 
+                    value={creatorGridSize} 
+                    onChange={(e) => setCreatorGridSize(Number(e.target.value))}
+                    style={{ width: '100%', accentColor: 'var(--gold-primary)', cursor: 'pointer' }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                    <span>2×2 (4 pieces)</span>
+                    <span>10×10 (100)</span>
+                    <span>20×20 (400)</span>
                   </div>
                 </div>
 
-                <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.5 }}>
-                  <Layers size={28} color="var(--gold-primary)" style={{ margin: '0 auto 0.5rem', opacity: 0.6 }} />
-                  Source image is loaded and ready. In Stage 2, clicking <strong>Split Image</strong> will crop individual tile pieces with permanent IDs!
+                <div style={{ background: 'var(--bg-offwhite)', padding: '1rem', borderRadius: 8, border: '1px solid var(--border-light)' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#111215', display: 'block', marginBottom: '0.5rem' }}>
+                    Piece Cut Style
+                  </label>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button 
+                      onClick={() => setCreatorStyle('tiles')}
+                      className={`btn ${creatorStyle === 'tiles' ? 'btn-primary' : 'btn-secondary'}`}
+                      style={{ flex: 1, padding: '0.4rem', fontSize: '0.75rem' }}
+                    >
+                      Square Tiles
+                    </button>
+                    <button 
+                      onClick={() => setCreatorStyle('jigsaw')}
+                      className={`btn ${creatorStyle === 'jigsaw' ? 'btn-primary' : 'btn-secondary'}`}
+                      style={{ flex: 1, padding: '0.4rem', fontSize: '0.75rem' }}
+                    >
+                      Classic Jigsaw
+                    </button>
+                  </div>
                 </div>
+
+                <button 
+                  onClick={handleGenerateCreatorTiles}
+                  disabled={!activeImage || generatingCreator}
+                  className="btn btn-primary"
+                  style={{ width: '100%' }}
+                >
+                  <Wand2 size={16} />
+                  <span>Generate Puzzle Pieces</span>
+                </button>
               </div>
             ) : (
-              <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-secondary)', fontSize: '0.825rem', lineHeight: 1.55 }}>
-                <Layers size={32} color="var(--gold-primary)" style={{ margin: '0 auto 0.75rem', opacity: 0.4 }} />
-                Upload a source image on the left to inspect grid partitions and piece metadata.
+              /* Solver Inspector */
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <div style={{ background: 'var(--bg-offwhite)', padding: '1rem', borderRadius: 8, border: '1px solid var(--border-light)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--gold-primary)', fontWeight: 700, fontSize: '0.85rem' }}>
+                    <Layers size={16} />
+                    <span>Solver Status</span>
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    Grid: <strong>{project.grid_rows || 2}×{project.grid_cols || 2} ({(project.grid_rows || 2) * (project.grid_cols || 2)} Pieces)</strong><br/>
+                    Status: <strong>{solveResult ? 'Solved (Top 5 Ranked)' : 'Awaiting Execution'}</strong>
+                  </div>
+                </div>
+
+                {solveResult && (
+                  <div style={{ background: '#ffffff', padding: '1rem', borderRadius: 8, border: '1px solid var(--border-light)' }}>
+                    <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#111215', marginBottom: '0.5rem' }}>
+                      Mapping Breakdown
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                      {solveResult.topCandidates[activeCandidateIdx].placement.map((item, slotIdx) => (
+                        <div key={slotIdx} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.25rem 0', borderBottom: '1px solid #f0f0f0' }}>
+                          <span>Target Slot {slotIdx + 1}</span>
+                          <span style={{ fontWeight: 700, color: 'var(--gold-primary)' }}>Source Tile #{item.tileIndex + 1}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
