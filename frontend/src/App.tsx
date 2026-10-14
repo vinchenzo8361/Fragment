@@ -15,20 +15,13 @@ function NavigationBar() {
   return (
     <nav className="navbar">
       <div className="nav-left">
-        {/* Layer icon removed as requested - Clean text-based Home and tab nav */}
+        {/* Core Product Navigation */}
         <div className="nav-links">
           <Link 
             to="/" 
             className={`nav-item ${location.pathname === '/' ? 'active' : ''}`}
           >
             Home
-          </Link>
-          <Link 
-            to="/about" 
-            className={`nav-item ${location.pathname === '/about' ? 'active' : ''}`}
-          >
-            <Info size={14} />
-            <span>About</span>
           </Link>
           <Link 
             to="/projects" 
@@ -48,6 +41,15 @@ function NavigationBar() {
       </div>
 
       <div className="nav-right">
+        {/* About Link moved to the right side as requested */}
+        <Link 
+          to="/about" 
+          className={`nav-item nav-right-item ${location.pathname === '/about' ? 'active' : ''}`}
+        >
+          <Info size={14} />
+          <span>About</span>
+        </Link>
+
         {/* Top Right Login Link */}
         <Link 
           to="/login" 

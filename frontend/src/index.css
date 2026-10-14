@@ -1,39 +1,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* 
-  Refined Palette:
-  - Base: Warm Architectural Alabaster & Off-White (#F7F6F1, #FAF9F5)
-  - Cards: Crisp Pearl White (#FFFFFF)
-  - Borders: Warm Stone Greige (#E4DFD5)
-  - Subtle Gold Accent: Soft Metallic Gold (#B8860B) used sparingly (<5%)
-  - Visible Forensic Pattern: Organic jigsaw tabs & puzzle geometry watermark
+  Warm Off-White, Architectural Stone & Restrained Gold (<3%):
+  - Base: Warm Architectural Alabaster / Muted Off-White (#F7F6F2, #FAF9F5)
+  - Cards: Crisp Pure White (#FFFFFF)
+  - Borders: Warm Stone Greige (#E5DFD4)
+  - Background Art: Continuous Forensic Constellation & Fragment Topography Pattern (NO grid squares)
 */
 :root {
   /* Dominant Base & Warm Off-White */
-  --bg-base: #f7f6f1;
+  --bg-base: #f6f5f0;
   --bg-offwhite: #faf9f5;
   --bg-white: #ffffff;
   
   /* Structural Surfaces */
   --surface-card: #ffffff;
-  --surface-card-hover: #fbfaf5;
-  --surface-subtle: #f2f0e8;
-  --border-light: #e4dfd5;
+  --surface-card-hover: #fbfaf6;
+  --surface-subtle: #f0eee5;
+  --border-light: #e5dfd4;
   --border-warm: #d5cebf;
-  --border-gold-subtle: rgba(184, 134, 11, 0.25);
+  --border-gold-subtle: rgba(184, 134, 11, 0.22);
   
   /* Text Contrast Hierarchy */
   --text-primary: #14161a;
-  --text-secondary: #454854;
+  --text-secondary: #484c58;
   --text-muted: #6e7382;
-  --text-dim: #9297a6;
+  --text-dim: #9398a8;
 
-  /* Restrained Metallic Gold Accent (<5%) */
+  /* Restrained Metallic Gold Accent (<3%) */
   --gold-primary: #b8860b;
   --gold-hover: #a17507;
   --gold-bright: #d4af37;
-  --gold-glow: rgba(184, 134, 11, 0.12);
-  --gold-subtle-bg: rgba(184, 134, 11, 0.06);
+  --gold-glow: rgba(184, 134, 11, 0.1);
+  --gold-subtle-bg: rgba(184, 134, 11, 0.05);
 
   /* Fonts */
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -55,14 +54,14 @@ body {
   -webkit-font-smoothing: antialiased;
 
   /* 
-    Organic Jigsaw & Forensic Fragment Pattern:
-    - Subtle curved jigsaw tabs & interlocking puzzle nodes
-    - Warm off-white with delicate stone-gold outlines
+    Forensic Reconstruction Topography & Constellation Wave Pattern:
+    - Flowing geometric triangulation lines, shard facets, and subtle measurement crosshairs
+    - NO square grids. Smooth, organic mathematical mesh in warm off-white stone & gold trace
   */
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.05) 0%, transparent 60%),
-    url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23b8860b' stroke-width='0.8' stroke-opacity='0.12'%3E%3Cpath d='M0 60h40c0-7 6-12 12-12s12 5 12 12h56' /%3E%3Cpath d='M60 0v40c7 0 12 6 12 12s-5 12-12 12v56' /%3E%3Cpath d='M30 30c6 0 10-4 10-10s-4-10-10-10' stroke-opacity='0.08' /%3E%3Cpath d='M90 90c-6 0-10 4-10 10s4 10 10 10' stroke-opacity='0.08' /%3E%3Ccircle cx='60' cy='60' r='2' fill='%23b8860b' fill-opacity='0.18'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 100% 100%, 120px 120px;
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.04) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg width='160' height='160' viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%238a8370' stroke-width='0.75' stroke-opacity='0.18'%3E%3Cpath d='M0 40 L40 0 L100 20 L160 0' /%3E%3Cpath d='M40 0 L70 80 L0 120' /%3E%3Cpath d='M100 20 L70 80 L130 110 L160 60' /%3E%3Cpath d='M0 120 L70 80 L90 160 L0 160' /%3E%3Cpath d='M70 80 L130 110 L160 160 L90 160' /%3E%3Ccircle cx='70' cy='80' r='2' fill='%23b8860b' fill-opacity='0.3' stroke='%23b8860b' stroke-opacity='0.4' /%3E%3Ccircle cx='40' cy='0' r='1.5' fill='%238a8370' fill-opacity='0.25' /%3E%3Ccircle cx='100' cy='20' r='1.5' fill='%238a8370' fill-opacity='0.25' /%3E%3Ccircle cx='130' cy='110' r='1.5' fill='%238a8370' fill-opacity='0.25' /%3E%3C/g%3E%3C/svg%3E");
+  background-size: 100% 100%, 160px 160px;
   background-attachment: fixed;
 }
 
