@@ -2,10 +2,10 @@
 
 /* 
   Warm Off-White, Architectural Stone & Restrained Gold (<3%):
-  - Base: Warm Architectural Alabaster / Muted Off-White (#F7F6F2, #FAF9F5)
+  - Base: Warm Architectural Alabaster / Muted Off-White (#F6F5F0)
   - Cards: Crisp Pure White (#FFFFFF)
   - Borders: Warm Stone Greige (#E5DFD4)
-  - Background Art: Continuous Forensic Constellation & Fragment Topography Pattern (NO grid squares)
+  - Background Art: Multi-scale layered shattered shards, random angled cracks & sporadic floating nodes
 */
 :root {
   /* Dominant Base & Warm Off-White */
@@ -54,14 +54,20 @@ body {
   -webkit-font-smoothing: antialiased;
 
   /* 
-    Forensic Reconstruction Topography & Constellation Wave Pattern:
-    - Flowing geometric triangulation lines, shard facets, and subtle measurement crosshairs
-    - NO square grids. Smooth, organic mathematical mesh in warm off-white stone & gold trace
+    Erratic, sporadic, non-repeating forensic shattered-glass & scattered fragment field:
+    - Layer 1: Ambient warm lighting aura
+    - Layer 2: Primary large irregular shard fractures (480px aperiodic scale)
+    - Layer 3: Secondary offset sporadic micro-cracks & floating particle debris (310px prime offset scale)
+    Result: The two scales are coprime (480px and 310px), eliminating visible repetitive tile patterns!
   */
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.04) 0%, transparent 60%),
-    url("data:image/svg+xml,%3Csvg width='160' height='160' viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%238a8370' stroke-width='0.75' stroke-opacity='0.18'%3E%3Cpath d='M0 40 L40 0 L100 20 L160 0' /%3E%3Cpath d='M40 0 L70 80 L0 120' /%3E%3Cpath d='M100 20 L70 80 L130 110 L160 60' /%3E%3Cpath d='M0 120 L70 80 L90 160 L0 160' /%3E%3Cpath d='M70 80 L130 110 L160 160 L90 160' /%3E%3Ccircle cx='70' cy='80' r='2' fill='%23b8860b' fill-opacity='0.3' stroke='%23b8860b' stroke-opacity='0.4' /%3E%3Ccircle cx='40' cy='0' r='1.5' fill='%238a8370' fill-opacity='0.25' /%3E%3Ccircle cx='100' cy='20' r='1.5' fill='%238a8370' fill-opacity='0.25' /%3E%3Ccircle cx='130' cy='110' r='1.5' fill='%238a8370' fill-opacity='0.25' /%3E%3C/g%3E%3C/svg%3E");
-  background-size: 100% 100%, 160px 160px;
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.05) 0%, transparent 60%),
+    /* Layer 2: Large irregular shard fractures */
+    url("data:image/svg+xml,%3Csvg width='480' height='480' viewBox='0 0 480 480' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%238c8470' stroke-width='0.8' stroke-opacity='0.16'%3E%3Cpath d='M23 71 L187 42 L112 268 L39 184 Z' /%3E%3Cpath d='M187 42 L342 98 L296 231 L112 268 Z' /%3E%3Cpath d='M342 98 L458 34 L412 195 L296 231 Z' /%3E%3Cpath d='M112 268 L241 389 L86 442 L18 361 Z' /%3E%3Cpath d='M296 231 L379 362 L241 389 Z' /%3E%3Cpath d='M412 195 L464 318 L379 362 Z' /%3E%3Cpath d='M241 389 L321 468 L174 476 Z' /%3E%3Ccircle cx='187' cy='42' r='2' fill='%23b8860b' fill-opacity='0.28' /%3E%3Ccircle cx='296' cy='231' r='2' fill='%23b8860b' fill-opacity='0.28' /%3E%3Ccircle cx='86' cy='442' r='1.5' fill='%238c8470' fill-opacity='0.2' /%3E%3Ccircle cx='464' cy='318' r='1.5' fill='%238c8470' fill-opacity='0.2' /%3E%3C/g%3E%3C/svg%3E"),
+    /* Layer 3: Secondary offset sporadic micro-shards & erratic diagonal stress lines */
+    url("data:image/svg+xml,%3Csvg width='310' height='310' viewBox='0 0 310 310' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%237d7560' stroke-width='0.6' stroke-opacity='0.13'%3E%3Cpath d='M45 12 L198 143' /%3E%3Cpath d='M285 67 L162 278' /%3E%3Cpath d='M12 245 L132 178 L78 298' /%3E%3Cpath d='M210 18 L265 92 L198 143' /%3E%3Cpolygon points='145,55 168,72 152,90' fill='%23b8860b' fill-opacity='0.04' stroke='%23b8860b' stroke-opacity='0.2' /%3E%3Cpolygon points='50,190 74,175 62,215' fill='%238c8470' fill-opacity='0.03' stroke='%238c8470' stroke-opacity='0.18' /%3E%3Ccircle cx='132' cy='178' r='1.5' fill='%23b8860b' fill-opacity='0.3' /%3E%3Ccircle cx='265' cy='92' r='1.5' fill='%238c8470' fill-opacity='0.25' /%3E%3Ccircle cx='45' cy='12' r='1.2' fill='%238c8470' fill-opacity='0.2' /%3E%3C/g%3E%3C/svg%3E");
+  background-size: 100% 100%, 480px 480px, 310px 310px;
+  background-position: 0 0, 0 0, 75px 120px;
   background-attachment: fixed;
 }
 
