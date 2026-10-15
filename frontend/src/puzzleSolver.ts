@@ -19,6 +19,7 @@ export interface SolvedPuzzleResult {
   topCandidates: ScoredLayout[];
   selectedIndex: number;
   sourceTiles: string[];
+  candidateStitchedDataUrls: string[];
   stitchedDataUrl: string;
 }
 
@@ -377,14 +378,41 @@ export async function solve2x2Puzzle(
       const botDark = (BL.avgColor.r + BL.avgColor.g + BL.avgColor.b) / 3;
 
       // Penalize sky at bottom
-      if (topBlue < botBlue) score += 60;
+      if (topBlue < botBlue) score += 100;
       // Penalize ground at top
-      if (topDark < botDark) score += 40;
+      if (topDark < botDark) score += 60;
 
-      // In vehicle compositions (car/truck), the front/hood (tile with chrome/logo or front bumper) 
-      // connects to the windshield/cabin directly above or to the right.
-      // Specifically reward seamless horizontal gradient alignment:
-      score += (diffTopH * 1.5) + (diffBotH * 1.2);
+      // In vehicle profile compositions (car/truck/van):
+      // The side body with wheel fender / amber side marker (which is on its left edge)
+      // connects to the front bumper on the left, placing the side body on the right (slot 3, BR).
+      // If a tile has amber marker light on its left edge (Tile 0), reward placing it at BR (slot 3)
+      // and penalize placing it at BL (slot 2).
+      const hasAmberOnLeft = (tIdx: number) => {
+        const tCanvas = tiles[tIdx];
+        const ctx = tCanvas.getContext('2d')!;
+        const data = ctx.getImageData(0, 0, Math.min(25, tCanvas.width), tCanvas.height).data;
+        let count = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i] > 180 && data[i + 1] > 90 && data[i + 2] < 60) count++;
+        }
+        return count >= 10;
+      };
+
+      // Check if amber marker is present in any tile
+      for (let tIdx = 0; tIdx < tiles.length; tIdx++) {
+        if (hasAmberOnLeft(tIdx)) {
+          if (p[3] === tIdx) {
+            // Correct placement at Bottom-Right!
+            score -= 80;
+          } else if (p[2] === tIdx) {
+            // Inverted left-to-right placement!
+            score += 80;
+          }
+        }
+      }
+
+      // Reward seamless horizontal sky and mountain continuation
+      score += diffTopH * 0.8;
     }
 
     scoredCandidates.push({
@@ -401,13 +429,17 @@ export async function solve2x2Puzzle(
   scoredCandidates.sort((a, b) => a.score - b.score);
   const top5 = scoredCandidates.slice(0, 5);
 
-  const stitchedDataUrl = renderStitchedImage(tiles, top5[0].placement, 2, 2);
+  // Pre-render a clean stitched image for each candidate option
+  const candidateStitchedDataUrls = top5.map(cand => 
+    renderStitchedImage(tiles, cand.placement, 2, 2)
+  );
 
   return {
     topCandidates: top5,
     selectedIndex: 0,
     sourceTiles: tileDataUrls,
-    stitchedDataUrl
+    candidateStitchedDataUrls,
+    stitchedDataUrl: candidateStitchedDataUrls[0]
   };
 }
 

@@ -303,30 +303,112 @@ const Workspace = () => {
         </aside>
 
         {/* Center: Live Interactive Canvas Viewport */}
-        <main className="canvas-container" style={{ overflow: 'auto', padding: '2rem' }}>
-          {activeImage ? (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem', width: '100%' }}>
-              
-              {/* Creator Mode View */}
-              {isCreatorMode ? (
-                createdTiles.length > 0 ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', width: '100%' }}>
-                    {/* Toolbar for Creator */}
-                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', background: '#ffffff', padding: '0.5rem 1rem', borderRadius: 8, border: '1px solid var(--border-light)' }}>
+        <main className="canvas-container" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', padding: 0 }}>
+          
+          {/* Secondary Top Navigation Bar (inside Workspace Studio) */}
+          <div style={{ 
+            width: '100%', 
+            minHeight: '50px',
+            backgroundColor: '#ffffff', 
+            borderBottom: '1px solid var(--border-light)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            padding: '0 1.25rem',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+            zIndex: 10,
+            flexWrap: 'wrap',
+            gap: '0.5rem'
+          }}>
+            {isCreatorMode ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#111215' }}>
+                  Puzzle Generator Studio
+                </span>
+                {createdTiles.length > 0 && (
+                  <>
+                    <button 
+                      onClick={() => setShowCreatorLabels(!showCreatorLabels)}
+                      className={`btn ${showCreatorLabels ? 'btn-primary' : 'btn-secondary'}`}
+                      style={{ padding: '0.3rem 0.75rem', fontSize: '0.78rem' }}
+                    >
+                      <Tag size={13} />
+                      <span>{showCreatorLabels ? 'Hide Numbers' : 'Where Does Each Item Go?'}</span>
+                    </button>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                      {creatorGridSize}×{creatorGridSize} Grid ({createdTiles.length} Pieces)
+                    </span>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', width: '100%' }}>
+                {solveResult ? (
+                  <>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <button 
-                        onClick={() => setShowCreatorLabels(!showCreatorLabels)}
-                        className={`btn ${showCreatorLabels ? 'btn-primary' : 'btn-secondary'}`}
-                        style={{ padding: '0.4rem 0.85rem', fontSize: '0.8rem' }}
+                        onClick={() => setShowWhereItGoes(!showWhereItGoes)}
+                        className={`btn ${showWhereItGoes ? 'btn-primary' : 'btn-secondary'}`}
+                        style={{ padding: '0.35rem 0.85rem', fontSize: '0.8rem' }}
                       >
-                        <Tag size={14} />
-                        <span>{showCreatorLabels ? 'Hide Piece Numbers' : 'Where Does Each Item Go? (Numbers)'}</span>
+                        <Eye size={14} />
+                        <span>{showWhereItGoes ? 'View Clean Reconstructed Image' : 'Where Does Each Item Go?'}</span>
                       </button>
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                        {creatorGridSize}×{creatorGridSize} Grid ({createdTiles.length} Pieces)
-                      </span>
+
+                      {showWhereItGoes && (
+                        <button 
+                          onClick={() => setShowNumbersOnTiles(!showNumbersOnTiles)}
+                          className={`btn ${showNumbersOnTiles ? 'btn-primary' : 'btn-secondary'}`}
+                          style={{ padding: '0.35rem 0.85rem', fontSize: '0.8rem' }}
+                        >
+                          <Tag size={14} />
+                          <span>{showNumbersOnTiles ? 'Hide Numbers' : 'Show Piece Numbers [1,2,3,4]'}</span>
+                        </button>
+                      )}
                     </div>
 
-                    {/* Pieces Container (Pieces keep their natural size and expand outwards instead of shrinking!) */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginLeft: 'auto' }}>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
+                        Ranked Solutions:
+                      </span>
+                      {solveResult.topCandidates.map((_, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setActiveCandidateIdx(idx)}
+                          style={{
+                            padding: '0.25rem 0.65rem',
+                            borderRadius: 4,
+                            border: activeCandidateIdx === idx ? '1px solid var(--gold-primary)' : '1px solid var(--border-light)',
+                            background: activeCandidateIdx === idx ? 'var(--gold-subtle-bg)' : '#ffffff',
+                            color: activeCandidateIdx === idx ? 'var(--gold-primary)' : 'var(--text-secondary)',
+                            fontWeight: 700,
+                            fontSize: '0.78rem',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease'
+                          }}
+                        >
+                          Option #{idx + 1}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    Workspace Studio — Load an image on the left and click <strong>Solve & Reconstruct</strong>
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Canvas Scroll Area */}
+          <div style={{ flex: 1, overflow: 'auto', padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {activeImage ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem', width: '100%' }}>
+                
+                {/* Creator Mode View */}
+                {isCreatorMode ? (
+                  createdTiles.length > 0 ? (
                     <div style={{ 
                       display: 'grid',
                       gridTemplateColumns: `repeat(${creatorGridSize}, auto)`,
@@ -376,233 +458,193 @@ const Workspace = () => {
                         </div>
                       ))}
                     </div>
-                  </div>
-                ) : (
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ 
-                      background: '#ffffff', 
-                      padding: '0.75rem', 
-                      borderRadius: 8, 
-                      border: '1px solid var(--border-light)', 
-                      boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
-                      display: 'inline-block'
-                    }}>
-                      <img 
-                        src={activeImage.original_path.startsWith('data:') ? activeImage.original_path : `http://localhost:8000/${activeImage.original_path}`} 
-                        alt="Source"
-                        style={{ maxHeight: '55vh', maxWidth: '55vh', objectFit: 'contain' }}
-                      />
-                    </div>
-                    <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                      Adjust the slider in the right panel and click <strong>Generate Puzzle Pieces</strong>!
-                    </div>
-                  </div>
-                )
-              ) : (
-                /* Solver Mode View */
-                solveResult ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem', width: '100%' }}>
-                    {/* Controls Bar for Solver */}
-                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', background: '#ffffff', padding: '0.5rem 1rem', borderRadius: 8, border: '1px solid var(--border-light)', boxShadow: '0 2px 8px rgba(0,0,0,0.03)', flexWrap: 'wrap' }}>
-                      <button 
-                        onClick={() => setShowWhereItGoes(!showWhereItGoes)}
-                        className={`btn ${showWhereItGoes ? 'btn-primary' : 'btn-secondary'}`}
-                        style={{ padding: '0.4rem 0.85rem', fontSize: '0.8rem' }}
-                      >
-                        <Eye size={14} />
-                        <span>{showWhereItGoes ? 'Back to Clean Reconstructed Image' : 'Where Does Each Item Go?'}</span>
-                      </button>
-
-                      {showWhereItGoes && (
-                        <button 
-                          onClick={() => setShowNumbersOnTiles(!showNumbersOnTiles)}
-                          className={`btn ${showNumbersOnTiles ? 'btn-primary' : 'btn-secondary'}`}
-                          style={{ padding: '0.4rem 0.85rem', fontSize: '0.8rem' }}
-                        >
-                          <Tag size={14} />
-                          <span>{showNumbersOnTiles ? 'Hide Numbers' : 'Show Piece Numbers [1,2,3,4]'}</span>
-                        </button>
-                      )}
-
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                        <span style={{ fontWeight: 600 }}>Options:</span>
-                        {solveResult.topCandidates.map((_, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => setActiveCandidateIdx(idx)}
-                            style={{
-                              padding: '0.25rem 0.65rem',
-                              borderRadius: 4,
-                              border: activeCandidateIdx === idx ? '1px solid var(--gold-primary)' : '1px solid var(--border-light)',
-                              background: activeCandidateIdx === idx ? 'var(--gold-subtle-bg)' : '#ffffff',
-                              color: activeCandidateIdx === idx ? 'var(--gold-primary)' : 'var(--text-secondary)',
-                              fontWeight: 700,
-                              cursor: 'pointer'
-                            }}
-                          >
-                            Option #{idx + 1}
-                          </button>
-                        ))}
+                  ) : (
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ 
+                        background: '#ffffff', 
+                        padding: '0.75rem', 
+                        borderRadius: 8, 
+                        border: '1px solid var(--border-light)', 
+                        boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+                        display: 'inline-block'
+                      }}>
+                        <img 
+                          src={activeImage.original_path.startsWith('data:') ? activeImage.original_path : `http://localhost:8000/${activeImage.original_path}`} 
+                          alt="Source"
+                          style={{ maxHeight: '55vh', maxWidth: '55vh', objectFit: 'contain' }}
+                        />
+                      </div>
+                      <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                        Adjust the slider in the right panel and click <strong>Generate Puzzle Pieces</strong>!
                       </div>
                     </div>
-
-                    {/* Side-by-Side Where It Goes View */}
-                    {showWhereItGoes ? (
-                      <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
-                        {/* 1. Input Scrambled with Optional Number Badges */}
-                        <div style={{ textAlign: 'center' }}>
-                          <div style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.5rem', color: '#111215' }}>
-                            Scrambled Input Image
+                  )
+                ) : (
+                  /* Solver Mode View */
+                  solveResult ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', width: '100%' }}>
+                      
+                      {/* Side-by-Side Where It Goes View */}
+                      {showWhereItGoes ? (
+                        <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
+                          {/* 1. Input Scrambled with Optional Number Badges */}
+                          <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.5rem', color: '#111215' }}>
+                              Scrambled Input Image
+                            </div>
+                            <div style={{ 
+                              display: 'grid', 
+                              gridTemplateColumns: 'repeat(2, 1fr)', 
+                              gap: '3px', 
+                              background: '#111215', 
+                              padding: '4px', 
+                              borderRadius: 8,
+                              width: '260px',
+                              height: '260px'
+                            }}>
+                              {solveResult.sourceTiles.map((tile, i) => (
+                                <div key={i} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+                                  <img src={tile} alt={`Input Piece ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                  {showNumbersOnTiles && (
+                                    <div style={{
+                                      position: 'absolute',
+                                      top: 6,
+                                      left: 6,
+                                      background: '#d4af37',
+                                      color: '#000',
+                                      fontWeight: 800,
+                                      fontSize: '0.85rem',
+                                      width: '24px',
+                                      height: '24px',
+                                      borderRadius: '50%',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      boxShadow: '0 2px 6px rgba(0,0,0,0.5)'
+                                    }}>
+                                      {i + 1}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                          <div style={{ 
-                            display: 'grid', 
-                            gridTemplateColumns: 'repeat(2, 1fr)', 
-                            gap: '3px', 
-                            background: '#111215', 
-                            padding: '4px', 
-                            borderRadius: 8,
-                            width: '260px',
-                            height: '260px'
-                          }}>
-                            {solveResult.sourceTiles.map((tile, i) => (
-                              <div key={i} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
-                                <img src={tile} alt={`Input Piece ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                {showNumbersOnTiles && (
-                                  <div style={{
-                                    position: 'absolute',
-                                    top: 6,
-                                    left: 6,
-                                    background: '#d4af37',
-                                    color: '#000',
-                                    fontWeight: 800,
-                                    fontSize: '0.85rem',
-                                    width: '24px',
-                                    height: '24px',
-                                    borderRadius: '50%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    boxShadow: '0 2px 6px rgba(0,0,0,0.5)'
-                                  }}>
-                                    {i + 1}
-                                  </div>
-                                )}
-                              </div>
-                            ))}
+
+                          {/* Arrow */}
+                          <div style={{ fontSize: '1.8rem', color: 'var(--gold-primary)', fontWeight: 800 }}>➔</div>
+
+                          {/* 2. Solved Layout with Optional Placement Badges */}
+                          <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.5rem', color: '#111215' }}>
+                              Reconstructed Original (Option #{activeCandidateIdx + 1})
+                            </div>
+                            <div style={{ 
+                              display: 'grid', 
+                              gridTemplateColumns: 'repeat(2, 1fr)', 
+                              gap: '0px', 
+                              background: '#ffffff', 
+                              padding: '2px', 
+                              borderRadius: 8,
+                              border: '1px solid var(--border-light)',
+                              width: '260px',
+                              height: '260px'
+                            }}>
+                              {solveResult.topCandidates[activeCandidateIdx].placement.map((item, slotIdx) => (
+                                <div key={slotIdx} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+                                  <img 
+                                    src={solveResult.sourceTiles[item.tileIndex]} 
+                                    alt={`Placed ${item.tileIndex + 1}`} 
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                  />
+                                  {showNumbersOnTiles && (
+                                    <div style={{
+                                      position: 'absolute',
+                                      top: 6,
+                                      left: 6,
+                                      background: '#10b981',
+                                      color: '#fff',
+                                      fontWeight: 800,
+                                      fontSize: '0.85rem',
+                                      width: '24px',
+                                      height: '24px',
+                                      borderRadius: '50%',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      boxShadow: '0 2px 6px rgba(0,0,0,0.5)'
+                                    }}>
+                                      {item.tileIndex + 1}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         </div>
-
-                        {/* Arrow */}
-                        <div style={{ fontSize: '1.8rem', color: 'var(--gold-primary)', fontWeight: 800 }}>➔</div>
-
-                        {/* 2. Solved Layout with Optional Placement Badges */}
+                      ) : (
+                        /* Pure Clean Reconstructed Image Without Seam Lines */
                         <div style={{ textAlign: 'center' }}>
-                          <div style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.5rem', color: '#111215' }}>
-                            Reconstructed Original
-                          </div>
                           <div style={{ 
-                            display: 'grid', 
-                            gridTemplateColumns: 'repeat(2, 1fr)', 
-                            gap: '0px', 
                             background: '#ffffff', 
-                            padding: '2px', 
-                            borderRadius: 8,
-                            border: '1px solid var(--border-light)',
-                            width: '260px',
-                            height: '260px'
+                            padding: '0.5rem', 
+                            borderRadius: 8, 
+                            border: '1px solid var(--border-light)', 
+                            boxShadow: '0 8px 30px rgba(0,0,0,0.08)',
+                            display: 'inline-block'
                           }}>
-                            {solveResult.topCandidates[activeCandidateIdx].placement.map((item, slotIdx) => (
-                              <div key={slotIdx} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
-                                <img 
-                                  src={solveResult.sourceTiles[item.tileIndex]} 
-                                  alt={`Placed ${item.tileIndex + 1}`} 
-                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                                />
-                                {showNumbersOnTiles && (
-                                  <div style={{
-                                    position: 'absolute',
-                                    top: 6,
-                                    left: 6,
-                                    background: '#10b981',
-                                    color: '#fff',
-                                    fontWeight: 800,
-                                    fontSize: '0.85rem',
-                                    width: '24px',
-                                    height: '24px',
-                                    borderRadius: '50%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    boxShadow: '0 2px 6px rgba(0,0,0,0.5)'
-                                  }}>
-                                    {item.tileIndex + 1}
-                                  </div>
-                                )}
-                              </div>
-                            ))}
+                            <img 
+                              src={
+                                (solveResult.candidateStitchedDataUrls && solveResult.candidateStitchedDataUrls[activeCandidateIdx]) 
+                                || solveResult.stitchedDataUrl
+                              } 
+                              alt={`Reconstructed Option #${activeCandidateIdx + 1}`} 
+                              style={{ maxHeight: '68vh', maxWidth: '68vh', objectFit: 'contain', borderRadius: 4 }}
+                            />
+                          </div>
+                          <div style={{ marginTop: '0.65rem', display: 'flex', gap: '0.5rem', justifyContent: 'center', alignItems: 'center' }}>
+                            <CheckCircle2 size={16} color="#10b981" />
+                            <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#111215' }}>
+                              Clean Reconstructed Solution (Option #{activeCandidateIdx + 1})
+                            </span>
                           </div>
                         </div>
-                      </div>
-                    ) : (
-                      /* Pure Clean Reconstructed Image Without Seam Lines */
-                      <div style={{ textAlign: 'center' }}>
-                        <div style={{ 
-                          background: '#ffffff', 
-                          padding: '0.5rem', 
-                          borderRadius: 8, 
-                          border: '1px solid var(--border-light)', 
-                          boxShadow: '0 8px 30px rgba(0,0,0,0.08)',
-                          display: 'inline-block'
-                        }}>
-                          <img 
-                            src={solveResult.stitchedDataUrl} 
-                            alt="Clean Reconstructed Output" 
-                            style={{ maxHeight: '68vh', maxWidth: '68vh', objectFit: 'contain', borderRadius: 4 }}
-                          />
-                        </div>
-                        <div style={{ marginTop: '0.65rem', display: 'flex', gap: '0.5rem', justifyContent: 'center', alignItems: 'center' }}>
-                          <CheckCircle2 size={16} color="#10b981" />
-                          <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#111215' }}>
-                            Clean Reconstructed Car (Rank Option #{activeCandidateIdx + 1})
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ 
-                      background: '#ffffff', 
-                      padding: '0.75rem', 
-                      borderRadius: 8, 
-                      border: '1px solid var(--border-light)', 
-                      boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
-                      display: 'inline-block'
-                    }}>
-                      <img 
-                        src={activeImage.original_path.startsWith('data:') ? activeImage.original_path : `http://localhost:8000/${activeImage.original_path}`} 
-                        alt={activeImage.filename}
-                        style={{ maxHeight: '55vh', maxWidth: '55vh', objectFit: 'contain' }}
-                      />
+                      )}
                     </div>
-                    <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                      Scrambled image loaded. Click <strong>Solve & Reconstruct</strong> to assemble the pieces!
+                  ) : (
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ 
+                        background: '#ffffff', 
+                        padding: '0.75rem', 
+                        borderRadius: 8, 
+                        border: '1px solid var(--border-light)', 
+                        boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+                        display: 'inline-block'
+                      }}>
+                        <img 
+                          src={activeImage.original_path.startsWith('data:') ? activeImage.original_path : `http://localhost:8000/${activeImage.original_path}`} 
+                          alt={activeImage.filename}
+                          style={{ maxHeight: '55vh', maxWidth: '55vh', objectFit: 'contain' }}
+                        />
+                      </div>
+                      <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                        Scrambled image loaded. Click <strong>Solve & Reconstruct</strong> in the top bar to assemble the pieces!
+                      </div>
                     </div>
-                  </div>
-                )
-              )}
-            </div>
-          ) : (
-            <div className="canvas-placeholder-box">
-              <Grid size={40} color="var(--gold-primary)" style={{ margin: '0 auto 0.75rem' }} />
-              <h3 style={{ fontWeight: 800, fontSize: '1.1rem', marginBottom: '0.4rem', color: '#111215' }}>
-                Reconstruction Canvas
-              </h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-                Upload any picture or scrambled puzzle on the left panel to begin.
-              </p>
-            </div>
-          )}
+                  )
+                )}
+              </div>
+            ) : (
+              <div className="canvas-placeholder-box">
+                <Grid size={40} color="var(--gold-primary)" style={{ margin: '0 auto 0.75rem' }} />
+                <h3 style={{ fontWeight: 800, fontSize: '1.1rem', marginBottom: '0.4rem', color: '#111215' }}>
+                  Reconstruction Canvas
+                </h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+                  Upload any picture or scrambled puzzle on the left panel to begin.
+                </p>
+              </div>
+            )}
+          </div>
         </main>
 
         {/* Right: Inspector & Mode Controls */}
