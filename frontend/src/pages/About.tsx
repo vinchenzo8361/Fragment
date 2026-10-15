@@ -246,10 +246,10 @@ const About = () => {
           <li>
             <span className="bullet-queue"></span> 
             <div>
-              <div style={{ fontWeight: 700, color: '#14161a', fontSize: '0.95rem' }}>Stage 10 — Traditional Jigsaw Puzzles</div>
-              <div style={{ fontWeight: 700, color: '#14161a', fontSize: '0.95rem' }}>
-                <strong>Plain English:</strong> Reconstructs regular classic jigsaw puzzles with curved interlocking tabs and holes.<br />
-                <strong>Technical Details:</strong> Non-rectangular contour segmentation, Fourier descriptor curve matching, tab-to-blank geometric interlocking verification, and flat edge border detection.
+              <div style={{ fontWeight: 700, color: '#14161a', fontSize: '0.95rem' }}>Stage 10 — Traditional Jigsaw Puzzles (Puzzle-Bot Architecture)</div>
+              <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                <strong>Plain English:</strong> Inspired by the robotics puzzle solver (<a href="https://github.com/roksenhorn/puzzle-bot" target="_blank" rel="noreferrer" style={{ color: 'var(--gold-primary)', textDecoration: 'underline' }}>roksenhorn/puzzle-bot</a>), this reconstructs classic jigsaw puzzles by vectorizing piece curves into polygon contours, pinpointing outer border pieces, and matching microscopic tab and blank puzzle connections across millions of combinations.<br />
+                <strong>Technical Details:</strong> Polygon contour vectorization, corner and straight-edge detection, tab/blank classification with spatial node constraint graphs, edge profile distance matching, and branch-and-bound combinatorial optimization.
               </div>
             </div>
           </li>

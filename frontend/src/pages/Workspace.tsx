@@ -34,6 +34,8 @@ const Workspace = () => {
   const [aiPromptHint, setAiPromptHint] = useState('');
 
   // Puzzle Solver state
+  const [solverGridRows, setSolverGridRows] = useState(2);
+  const [solverGridCols, setSolverGridCols] = useState(2);
   const [solving, setSolving] = useState(false);
   const [solveResult, setSolveResult] = useState<SolvedPuzzleResult | null>(null);
   const [activeCandidateIdx, setActiveCandidateIdx] = useState(0);
@@ -674,12 +676,54 @@ const Workspace = () => {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                 <div style={{ background: 'var(--bg-offwhite)', padding: '1rem', borderRadius: 8, border: '1px solid var(--border-light)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.65rem', color: 'var(--gold-primary)', fontWeight: 700, fontSize: '0.85rem' }}>
+                    <Grid size={16} />
+                    <span>Grid Partition</span>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                    <div>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Rows</span>
+                      <input 
+                        type="number" 
+                        min={2} 
+                        max={10} 
+                        value={solverGridRows} 
+                        onChange={(e) => {
+                          setSolverGridRows(Number(e.target.value));
+                          setSolveResult(null);
+                        }} 
+                        className="form-input" 
+                        style={{ padding: '0.35rem 0.5rem', fontSize: '0.85rem', marginTop: '0.2rem' }}
+                      />
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Columns</span>
+                      <input 
+                        type="number" 
+                        min={2} 
+                        max={10} 
+                        value={solverGridCols} 
+                        onChange={(e) => {
+                          setSolverGridCols(Number(e.target.value));
+                          setSolveResult(null);
+                        }} 
+                        className="form-input" 
+                        style={{ padding: '0.35rem 0.5rem', fontSize: '0.85rem', marginTop: '0.2rem' }}
+                      />
+                    </div>
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    Total pieces: <strong>{solverGridRows * solverGridCols}</strong>
+                  </div>
+                </div>
+
+                <div style={{ background: 'var(--bg-offwhite)', padding: '1rem', borderRadius: 8, border: '1px solid var(--border-light)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--gold-primary)', fontWeight: 700, fontSize: '0.85rem' }}>
                     <Layers size={16} />
                     <span>Solver Status</span>
                   </div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                    Grid: <strong>2×2 (4 Pieces)</strong><br/>
+                    Grid: <strong>{solverGridRows}×{solverGridCols} ({solverGridRows * solverGridCols} Pieces)</strong><br/>
                     Status: <strong>{solveResult ? 'Solved (Top 5 Ranked)' : 'Awaiting Execution'}</strong>
                   </div>
                 </div>

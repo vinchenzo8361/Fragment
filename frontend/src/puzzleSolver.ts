@@ -34,7 +34,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 
 /**
  * Intelligent background & border cleaner:
- * Scans each grid cell, trims outer white margins, black separator frames, and tabletop borders.
+ * Scans image for inner divider lines/gutters, crops each quadrant, and strips outer white/black border padding.
  */
 export async function extractAndCleanTiles(
   imageSrc: string,
@@ -48,11 +48,94 @@ export async function extractAndCleanTiles(
   const sCtx = srcCanvas.getContext('2d')!;
   sCtx.drawImage(img, 0, 0);
 
-  const cellW = img.width / cols;
-  const cellH = img.height / rows;
-
   const tiles: HTMLCanvasElement[] = [];
   const tileDataUrls: string[] = [];
+
+  // If 2x2, detect exact gutter/dividers
+  if (rows === 2 && cols === 2) {
+    const sData = sCtx.getImageData(0, 0, img.width, img.height).data;
+    
+    // Find horizontal gutter (mostly white near middle)
+    let bestY = Math.floor(img.height / 2);
+    let maxWhiteY = -1;
+    for (let y = Math.floor(img.height * 0.35); y <= Math.floor(img.height * 0.65); y++) {
+      let whiteCount = 0;
+      for (let x = 0; x < img.width; x++) {
+        const idx = (y * img.width + x) * 4;
+        if (sData[idx] > 225 && sData[idx + 1] > 225 && sData[idx + 2] > 225) {
+          whiteCount++;
+        }
+      }
+      if (whiteCount > maxWhiteY) {
+        maxWhiteY = whiteCount;
+        bestY = y;
+      }
+    }
+
+    // Find vertical divider in top half and bottom half
+    let bestXTop = Math.floor(img.width / 2);
+    let maxDarkXTop = -1;
+    for (let x = Math.floor(img.width * 0.35); x <= Math.floor(img.width * 0.65); x++) {
+      let darkCount = 0;
+      for (let y = 60; y < bestY - 20; y++) {
+        const idx = (y * img.width + x) * 4;
+        if (sData[idx] < 45 && sData[idx + 1] < 45 && sData[idx + 2] < 45) {
+          darkCount++;
+        }
+      }
+      if (darkCount > maxDarkXTop) {
+        maxDarkXTop = darkCount;
+        bestXTop = x;
+      }
+    }
+
+    let bestXBot = Math.floor(img.width / 2);
+    let maxDarkXBot = -1;
+    for (let x = Math.floor(img.width * 0.35); x <= Math.floor(img.width * 0.65); x++) {
+      let darkCount = 0;
+      for (let y = bestY + 20; y < img.height - 40; y++) {
+        const idx = (y * img.width + x) * 4;
+        if (sData[idx] < 45 && sData[idx + 1] < 45 && sData[idx + 2] < 45) {
+          darkCount++;
+        }
+      }
+      if (darkCount > maxDarkXBot) {
+        maxDarkXBot = darkCount;
+        bestXBot = x;
+      }
+    }
+
+    const quads = [
+      { x: 0, y: 0, w: bestXTop, h: bestY },
+      { x: bestXTop, y: 0, w: img.width - bestXTop, h: bestY },
+      { x: 0, y: bestY, w: bestXBot, h: img.height - bestY },
+      { x: bestXBot, y: bestY, w: img.width - bestXBot, h: img.height - bestY },
+    ];
+
+    for (const q of quads) {
+      const tileCanvas = document.createElement('canvas');
+      const rawCanvas = document.createElement('canvas');
+      rawCanvas.width = q.w;
+      rawCanvas.height = q.h;
+      const rawCtx = rawCanvas.getContext('2d')!;
+      rawCtx.drawImage(srcCanvas, q.x, q.y, q.w, q.h, 0, 0, q.w, q.h);
+
+      const bounds = findPieceBounds(rawCtx, q.w, q.h);
+      tileCanvas.width = bounds.w;
+      tileCanvas.height = bounds.h;
+      const tCtx = tileCanvas.getContext('2d')!;
+      tCtx.drawImage(rawCanvas, bounds.x, bounds.y, bounds.w, bounds.h, 0, 0, bounds.w, bounds.h);
+
+      tiles.push(tileCanvas);
+      tileDataUrls.push(tileCanvas.toDataURL('image/png'));
+    }
+
+    return { tiles, tileDataUrls };
+  }
+
+  // Fallback for general N x M grids:
+  const cellW = img.width / cols;
+  const cellH = img.height / rows;
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
@@ -60,7 +143,6 @@ export async function extractAndCleanTiles(
       const startX = c * cellW;
       const startY = r * cellH;
 
-      // Temporary cell canvas
       const rawCanvas = document.createElement('canvas');
       rawCanvas.width = Math.floor(cellW);
       rawCanvas.height = Math.floor(cellH);
@@ -77,9 +159,7 @@ export async function extractAndCleanTiles(
         rawCanvas.height
       );
 
-      // Auto-detect bounding box of actual piece inside cell (stripping white/black borders)
       const bounds = findPieceBounds(rawCtx, rawCanvas.width, rawCanvas.height);
-
       tileCanvas.width = bounds.w;
       tileCanvas.height = bounds.h;
       const tCtx = tileCanvas.getContext('2d')!;
@@ -104,74 +184,74 @@ export async function extractAndCleanTiles(
 }
 
 /**
- * Scans cell inward from all 4 sides to discard white background (RGB > 240) and black frame bars (RGB < 25)
+ * Strips outer borders, white padding, and black frame lines
  */
 function findPieceBounds(ctx: CanvasRenderingContext2D, w: number, h: number) {
   const imgData = ctx.getImageData(0, 0, w, h).data;
 
-  const isBorder = (x: number, y: number) => {
+  const isBgOrBorderPixel = (x: number, y: number) => {
     const idx = (y * w + x) * 4;
     const r = imgData[idx];
     const g = imgData[idx + 1];
     const b = imgData[idx + 2];
-    // White background
-    if (r > 240 && g > 240 && b > 240) return true;
-    // Black border/frame
-    if (r < 30 && g < 30 && b < 30) return true;
+    // White padding
+    if (r > 215 && g > 215 && b > 215) return true;
+    // Black frame border
+    if (r < 50 && g < 50 && b < 50) return true;
     return false;
   };
 
-  let minX = 0;
-  let maxX = w - 1;
+  // Find min_y
   let minY = 0;
+  while (minY < h) {
+    let badCount = 0;
+    for (let x = 0; x < w; x++) {
+      if (isBgOrBorderPixel(x, minY)) badCount++;
+    }
+    if (badCount < w * 0.4) break;
+    minY++;
+  }
+
+  // Find max_y
   let maxY = h - 1;
-
-  // Trim top
-  while (minY < h / 3) {
-    let borderCount = 0;
+  while (maxY > minY) {
+    let badCount = 0;
     for (let x = 0; x < w; x++) {
-      if (isBorder(x, minY)) borderCount++;
+      if (isBgOrBorderPixel(x, maxY)) badCount++;
     }
-    if (borderCount > w * 0.75) minY++;
-    else break;
+    if (badCount < w * 0.4) break;
+    maxY--;
   }
 
-  // Trim bottom
-  while (maxY > (h * 2) / 3) {
-    let borderCount = 0;
-    for (let x = 0; x < w; x++) {
-      if (isBorder(x, maxY)) borderCount++;
-    }
-    if (borderCount > w * 0.75) maxY--;
-    else break;
-  }
+  const effH = maxY - minY + 1;
 
-  // Trim left
-  while (minX < w / 3) {
-    let borderCount = 0;
+  // Find min_x
+  let minX = 0;
+  while (minX < w) {
+    let badCount = 0;
     for (let y = minY; y <= maxY; y++) {
-      if (isBorder(minX, y)) borderCount++;
+      if (isBgOrBorderPixel(minX, y)) badCount++;
     }
-    if (borderCount > (maxY - minY) * 0.75) minX++;
-    else break;
+    if (badCount < effH * 0.4) break;
+    minX++;
   }
 
-  // Trim right
-  while (maxX > (w * 2) / 3) {
-    let borderCount = 0;
+  // Find max_x
+  let maxX = w - 1;
+  while (maxX > minX) {
+    let badCount = 0;
     for (let y = minY; y <= maxY; y++) {
-      if (isBorder(maxX, y)) borderCount++;
+      if (isBgOrBorderPixel(maxX, y)) badCount++;
     }
-    if (borderCount > (maxY - minY) * 0.75) maxX--;
-    else break;
+    if (badCount < effH * 0.4) break;
+    maxX--;
   }
 
-  // Add small safety margin inward (2 pixels) to guarantee zero black border bleed
-  const pad = 2;
-  minX = Math.min(minX + pad, maxX);
-  minY = Math.min(minY + pad, maxY);
-  maxX = Math.max(maxX - pad, minX);
-  maxY = Math.max(maxY - pad, minY);
+  // 2px inward margin to cleanly strip anti-aliased edge bleed
+  minX = Math.min(minX + 2, maxX);
+  minY = Math.min(minY + 2, maxY);
+  maxX = Math.max(maxX - 2, minX);
+  maxY = Math.max(maxY - 2, minY);
 
   const finalW = Math.max(10, maxX - minX);
   const finalH = Math.max(10, maxY - minY);
@@ -296,9 +376,15 @@ export async function solve2x2Puzzle(
       const topDark = (TL.avgColor.r + TL.avgColor.g + TL.avgColor.b) / 3;
       const botDark = (BL.avgColor.r + BL.avgColor.g + BL.avgColor.b) / 3;
 
-      // Penalize upside down orientations
-      if (topBlue < botBlue) score += 40;
-      if (topDark < botDark) score += 30;
+      // Penalize sky at bottom
+      if (topBlue < botBlue) score += 60;
+      // Penalize ground at top
+      if (topDark < botDark) score += 40;
+
+      // In vehicle compositions (car/truck), the front/hood (tile with chrome/logo or front bumper) 
+      // connects to the windshield/cabin directly above or to the right.
+      // Specifically reward seamless horizontal gradient alignment:
+      score += (diffTopH * 1.5) + (diffBotH * 1.2);
     }
 
     scoredCandidates.push({

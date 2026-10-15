@@ -6,8 +6,6 @@ import { createProject } from '../api';
 const ProjectSetup = () => {
   const [name, setName] = useState('');
   const [puzzleType, setPuzzleType] = useState('square-tile');
-  const [rows, setRows] = useState(2);
-  const [cols, setCols] = useState(2);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -59,8 +57,6 @@ const ProjectSetup = () => {
       const res = await createProject({ 
         name, 
         puzzle_type: puzzleType,
-        grid_rows: (puzzleType === 'square-tile' || puzzleType === 'puzzle-creator') ? Number(rows) : undefined,
-        grid_cols: (puzzleType === 'square-tile' || puzzleType === 'puzzle-creator') ? Number(cols) : undefined,
       });
       navigate(`/workspace/${res.data.id}`);
     } catch (err) {
@@ -126,37 +122,6 @@ const ProjectSetup = () => {
             </div>
           </div>
 
-          {(puzzleType === 'square-tile' || puzzleType === 'puzzle-creator') && (
-            <div className="form-group">
-              <label className="form-label">3. Initial Grid Partition</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Rows</span>
-                  <input 
-                    type="number" 
-                    min={2} 
-                    max={20}
-                    value={rows} 
-                    onChange={(e) => setRows(Number(e.target.value))}
-                    className="form-input" 
-                    style={{ marginTop: '0.25rem' }}
-                  />
-                </div>
-                <div>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Columns</span>
-                  <input 
-                    type="number" 
-                    min={2} 
-                    max={20}
-                    value={cols} 
-                    onChange={(e) => setCols(Number(e.target.value))}
-                    className="form-input" 
-                    style={{ marginTop: '0.25rem' }}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
 
           <div style={{ marginTop: '2rem', display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
             <button 
